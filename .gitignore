@@ -1,0 +1,23 @@
+## Core latex/pdflatex auxiliary files:
+*.aux
+*.lof
+*.log
+*.lot
+*.fls
+*.out
+*.toc
+*.fmt
+*.fot
+*.cb
+*.cb2
+.*.lb
+*.glo
+*.ist
+*.bbl
+*.blg
+*.yaml
+*.synctex.gz
+*.fdb_latexmk
+
+./lab01/build/ 
+

@@ -1,0 +1,107 @@
+\documentclass[a4paper, oneside]{memoir}
+
+\usepackage{pgfplots}
+\usepackage{bookmark}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage{listings}
+\usepackage{amsmath}
+\usepackage{bytefield}
+
+\setlength\cftchapterindent{\cftsectionindent}
+\setlength\cftbeforechapterskip{0pt}
+\renewcommand\cftchapterpagefont{\normalfont}
+
+\renewcommand{\cftchapterleader}{\cftdotfill{\cftdotsep}}
+
+\setlrmarginsandblock{1.25in}{1.25in}{*} 
+\setulmarginsandblock{1.25in}{1.25in}{*} 
+\checkandfixthelayout%
+
+\renewcommand{\thesection}{\arabic{section}}
+\renewcommand{\thefigure}{\arabic{figure}}
+
+\lstset{language=C++,
+                basicstyle=\ttfamily,
+                keywordstyle=\color{blue}\ttfamily,
+                stringstyle=\color{red}\ttfamily,
+                commentstyle=\color{lightgreen}\ttfamily,
+                morecomment=[l][\color{magenta}]{\#}
+}
+
+\newcommand*{\semester}[2]{Semester #1 -- #2} %chktex 8
+\newcommand*{\student}[3]{&\text{#1} &\text{#2} &&\text{#3}} %chktex 8
+\newcommand*{\titleAM}[4]%
+{\begingroup
+  \centering
+  {\Huge Assessment Task #2:\\#3\par}\\[\baselineskip]
+  {\small\scshape RMIT University}\par
+  {\small\scshape #4}\par\vspace{0.5em}
+  {\large Supervisor: #1}\par\vspace{0.5em}
+  \endgroup}
+
+\renewcommand{\tocheadstart}{}
+\renewcommand{\aftertoctitle}{}
+\renewcommand{\printtoctitle}[1]{}
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+
+\makeatletter
+\DeclareRobustCommand{\cskippedwords}[2][2ex]{%
+  \setlength{\units@wide}{\bf@bitwidth * \bits@wide}%
+  \setlength{\units@high}{1pt * \ratio{\units@wide}{6.0pt}}%
+  \setlength{\units@tall}{#1 + \units@high}%
+  \edef\num@wide{\strip@pt\units@wide}%
+  \edef\num@tall{\strip@pt\units@tall}%
+  \edef\num@high{\strip@pt\units@high}%
+  \begin{picture}(\num@wide,\num@tall)%
+  \begin{tikzpicture}[overlay]
+  \draw[fill=#2,fill opacity=0.2] 
+    (0,-\bf@bitheight) -- (0,0) -- (0,\units@high) -- (\units@wide,0) -- +(0,-\bf@bitheight) -- cycle;
+  \draw[fill=#2,fill opacity=0.2]
+    (0,\units@high+#1+\bf@bitheight) -- ++(\units@wide,0) -- ++(0,-\bf@bitheight-\units@high) -- (0,\units@high+#1) -- cycle;
+  \end{tikzpicture}%
+  \end{picture}%
+  \ifcounting@words
+    \inc@bytefield@height{\unitlength * \real{\num@tall}}%
+    \global\counting@wordsfalse
+  \fi}
+\makeatother
+
+\definecolor{bittersweet}{rgb}{1.0, 0.44, 0.37}
+\definecolor{aquamarine}{rgb}{0.5, 1.0, 0.83}
+\definecolor{lavender}{rgb}{0.9, 0.9, 0.98}
+\definecolor{whitesmoke}{rgb}{0.96, 0.96, 0.96}
+\definecolor{lightgreen}{RGB}{102,153,0}    %#669900
+
+\lstset{language=C++,
+        basicstyle=\ttfamily,
+        keywordstyle=\color{blue}\ttfamily,
+        stringstyle=\color{red}\ttfamily,
+        commentstyle=\color{lightgreen}\ttfamily,
+        morecomment=[l][\color{magenta}]{\#},
+        backgroundcolor=\color{whitesmoke}
+}
+
+\renewcommand{\bibname}{References}
+
+\begin{document}
+  \titleAM{Dr. Glenn Matthews}{1}{Project Proposal and Risk Assessment}{\semester{1}{2024}}
+  \begin{align*}
+    &\text{Name} &\text{Student No.} &&\text{Contribution}\\
+    \student{Matthew Ricci}{s3785111}{x\%}\\
+    \student{Jeremy Timotius}{s3779178}{x\%}
+  \end{align*}
+  \addcontentsline{toc}{part}{Contents}
+  \tableofcontents*
+  \clearpage
+
+  \markboth{}{}
+  \input{content}
+  \input{appendix}
+
+  \bibliographystyle{ieeetr}
+  \bibliography{proposal}
+\end{document}
