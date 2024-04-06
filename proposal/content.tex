@@ -49,6 +49,24 @@ An example of how this may be applicable is in the altitude calculations. The mo
 \end{questions}
 
 \section{Methodology}
+The high-level flow chart shown in Figure~\ref{fig:flowchart-high_level} depicts how raw sensor data is to be captured and transmitted from a firmware perspective.  The purpose of the flow chart is to guide avionics on how data is to be logged and transmitted to enable post flight analysis and verification. The system is primarily broken down into a high-resolution interval at 500Hz and low-resolution interval at 50Hz. These resolution intervals are intended to match with Blue Raven intervals in order to sync and compare data sets post flights. The Blue Raven data will act as benchmark to determine the accuracy of data collected from various sensors of the avionics unit. Logging of data will be triggered based on a launch event recorded from the Blue Raven to enable both systems to collect data simultaneously. 
+
+During flight, captured sensor data will be written to an onboard flash memory and transmitted over LoRa to ground communications, providing a level of redundancy to mitigate the risk of data loss. This dual approach ensures that if one method encounters failure or interruption, data can still be processed and analyzed post flight. While flash memory can only be analyzed post flight, LoRa communications provides critical live communications to the ground, enabling real-time monitoring and analysis of sensors and microcontrollers. Real-time processing through the use of algorithms is to be developed with the purpose of detecting hardware failures and or abnormalities to inform avionic systems to switch to redundant sensors or microcontrollers if required.  
+
+\begin{figure}
+  \begin{center}
+    \includegraphics[width=0.95\textwidth]{img/flowchart-high_level.png}
+  \end{center}
+  \caption{High-level functional flowchart of data sampling and logging}\label{fig:flowchart-high_level}
+\end{figure}
+
+Only Raw data will be collected and transmitted from each sensor register during flight. The aim of this approach is to optimize data collection and transmission rather than processing which will be conducted post flight. By doing so, onboard processing will be minimized, reducing the risk of processing errors and ensuring efficient utilization of LoRa bandwidth and onboard flash memory. 
+
+During the high-resolution interval, the system reads data from an IMU (Inertial Measurement Unit) which consists of an accelerometer, gyroscope, and magnetometer sensors. These sensors are essential in determining the aircraft motion and orientation; therefore, a higher sampling rate is required to capture subtle changes accurately. Raw data from sensor registers are then combined with header to form a data frame which will be stored in a buffer array ready to be stored in flash. Sensor data will additionally be kept in RAM to be transmitted during the low-resolution interval.  At the low-resolution interval, the system reads data from a barometer, which includes a pressure and temperature sensor to determine altitude. Similar to the high-resolution interval, raw data are used to form a data frame which is added to a buffer array serving as temporary storage before the data is written to flash. Once pressure and temperature data frame is formed and saved to RAM, the buffer array is written to flash and data stored in RAM will be transmitted over LoRa. Switch I/O will also be written to RAM and transmitted to ground control to notify avionic systems if a switch has turned off.  
+
+A number of alternate design methods were considered which included a separate logging interval where transmission and saving to flash occurred over a separate time frame. Although having a different interval provides greater control, flash writing and LoRa transmission occurring during on the low-resolution interval simplifies the design, consolidating data handling tasks.  
+
+\subsection{Mid-flight processing}
 
 \section{Risk assessment}
 From an occupational health and safety perspective, the risks associated with this project are minimal. Due to the nature of this project, most risks will be office related, which include, visual strain, neck, and back pain from long hours in front of computers causing eye strain, headaches, and fatigue. Although these risks pose health concerns, they can be effectively managed through ergonomic interventions such as the use of ergonomic furniture and regular breaks during project work. Additionally, some aspects of testing verification will include interaction with hardware such as sensors and other electronic modules. 
