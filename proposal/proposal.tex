@@ -86,13 +86,16 @@
 }
 
 \renewcommand{\bibname}{References}
+\newlist{questions}{enumerate}{2}
+\setlist[questions,1]{label=RQ\arabic*.,ref=RQ\arabic*}
+\setlist[questions,2]{label=(\alph*),ref=\thequestionsi(\alph*)}
 
 \begin{document}
   \titleAM{Dr. Glenn Matthews}{1}{Project Proposal and Risk Assessment}{\semester{1}{2024}}
   \begin{align*}
     &\text{Name} &\text{Student No.} &&\text{Contribution}\\
-    \student{Matthew Ricci}{s3785111}{x\%}\\
-    \student{Jeremy Timotius}{s3779178}{x\%}
+    \student{Matthew Ricci}{s3785111}{50\%}\\
+    \student{Jeremy Timotius}{s3779178}{50\%}
   \end{align*}
   \addcontentsline{toc}{part}{Contents}
   \tableofcontents*
