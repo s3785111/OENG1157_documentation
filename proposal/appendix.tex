@@ -1,9 +1,16 @@
 \renewcommand{\thechapter}{\Alph{chapter}}
 \renewcommand{\thefigure}{\Alph{chapter}.\arabic{figure}}
 \renewcommand{\chaptername}{Appendix}
+\addcontentsline{toc}{part}{Appendix}
 
-
-
-%\addcontentsline{toc}{part}{Appendix}
-%\clearpage
-%\chapter{}\label{apdx:a}
+\clearpage
+\chapter{Proposed timeline}\label{apdx:gantt}
+\setlrmarginsandblock{0.5cm}{0.5cm}{*}
+\checkandfixthelayout
+\vfill{}
+\begin{figure}[h]
+  \begin{center}
+    \includegraphics[width=\textwidth]{./img/gantt.png}
+  \end{center}
+\end{figure}
+\vfill{}

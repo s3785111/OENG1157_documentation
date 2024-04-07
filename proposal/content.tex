@@ -1,6 +1,6 @@
 \addcontentsline{toc}{section}{\textbf{Summary}}
 \begin{abstract}
-   
+Data analytics and verification is a subset of Avionics within the Aurora V Rocketry team, representing RMIT University in the 2024 Australian Universities Rocket Competition (AURC). Work conducted within this subsystem makes up the Capstone project with the aim to design, test, and validate data analytics for the avionics, ground communications, redundant electronic and payload systems. The aim of this proposal is to offer background research and a high-level overview of the methodologies and risks that are involved. The project will span across the launch of five Aurora Rocket, with each providing an opportunity to collect and analyse sensor data. From an analysis and verification perspective, previous Rocketry project have used techniques such as Kalman Filters and Sensor fusion for post flight data processing. Similar techniques will likely be employed for data analysis. Lastly, a number of risks and ethical considerations have been identified to ensure the responsible implementation of data analytics and verification processes.  
 \end{abstract}
 
 \section{Problem statement}
@@ -11,6 +11,7 @@ The project scope spans across five iterations of the Aurora rocket (A1 through 
 \subsection{Project Deliverables}
 Data analytics and verification processes will include:  
 \begin{itemize}
+  \item Data Capture and Logging Design: Defining sampling rates and intervals for data capture and establishing data logging and storing formats. 
   \item Real-Time Processing: Research and develop algorithms for sensor fusion to integrate data from multiple sensors. Implement filtering techniques to remove noise. 
   \item Post-Processing: Perform statistical analysis to evaluate key performance metrics of avionics systems. Implement systems to detect deviations from expected behaviour when comparing raw sensor and fused data to the data captured by the blue raven.     
   \item Data Visualization: Develop tools for generating informative graphs and charts for data interpretation. Explore the possibility of creating simulations based on collected data. 
@@ -41,9 +42,11 @@ An example of how this may be applicable is in the altitude calculations. The mo
 \section{Research questions}
 \begin{questions}
   \item What variables are necessary to track in the rocket state?
-  \item What algorithms should be run to accurately estimate rocket state in real time?
-  \item How will sensor fusion techniques be applied to obtain state information from available data?
-  \item What statistical methods will be employed to assess real time validity of data? \begin{questions}
+  \item What algorithms should be run to accurately estimate rocket state in real time (e.g. linear vs. extended Kalman Filter)?
+  \item How will sensor fusion techniques be applied to obtain state information from available data? \begin{questions}
+    \item What data from available sensors should be combined to state data?
+  \end{questions}
+  \item What statistical analysis techniques will be employed to assess real time validity of data? \begin{questions}
     \item What communication protocols will be used to inform the redundant systems of detected errata?
     \item What metric(s) will the redundant systems use to elect which of primary and secondary sensors to sample?
   \end{questions}
@@ -55,10 +58,22 @@ An example of how this may be applicable is in the altitude calculations. The mo
 \end{questions}
 
 \section{Methodology}
-\subsection{Functional breakdown}
-The high-level flow chart shown in Figure~\ref{fig:flowchart-high_level} depicts how raw sensor data is to be captured and transmitted from a firmware perspective.  The purpose of the flow chart is to guide avionics on how data is to be logged and transmitted to enable post flight analysis and verification. The system is primarily broken down into a high-resolution interval at 500Hz and low-resolution interval at 50Hz. 
+This section of the proposal focuses on the preparations that have been made to ensure the success of the project, outlining current design work and how it will enable further developments in the future. A brief discussion on time management and resource planning is provided, followed by a functional breakdown of the higher level design goals and on-board processes for data analytics and verification within the avionics subsystem. 
 
-These resolution intervals are intended to match with Blue Raven intervals in order to sync and compare data sets post flights. The Blue Raven data will act as benchmark to determine the accuracy of data collected from various sensors of the avionics unit. Logging of data will be triggered based on a launch event recorded from the Blue Raven to enable both systems to collect data simultaneously. 
+Additionally, some insight into the structure and handling of data both in real-time and offline are provided towards the end of this section.
+
+\subsection{Time planning}
+Appendix~\ref{apdx:gantt}
+
+\subsection{Resource planning}
+This project team consists of two students, Jeremy Timotius and Matthew Ricci with Dr Glenn Matthews as the project supervisor. As this team operates alongside the Avionics (ground communications and redundant systems) team, members of this team will serve as an ongoing resource. 
+
+Collaboration between the two teams will take place regularly through in person and online meetings. Other members from different subsystems may also be engaged as their skill set may be relevant to avionics. From a software perspective for data analysis, RMIT student licenses and laboratory computers will be utilized to perform project work.  
+
+\subsection{Functional breakdown}
+The high-level flow chart shown in Figure~\ref{fig:flowchart-high_level} depicts how raw sensor data is to be captured and transmitted from a firmware perspective. The purpose of the flow chart is to guide avionics on how data is to be logged and transmitted to enable post flight analysis and verification. The system is primarily broken down into a high-resolution interval at 500Hz and low-resolution interval at 50Hz. 
+
+These resolution intervals are intended to match with Blue Raven intervals in order to sync and compare data sets post flights. The Blue Raven data will act as a benchmark to determine the accuracy of data collected from various sensors of the avionics unit. Logging of data will be triggered based on a launch event recorded from the Blue Raven to enable both systems to collect data simultaneously. 
 
 During flight, captured sensor data will be written to an onboard flash memory and transmitted over LoRa to ground communications, providing a level of redundancy to mitigate the risk of data loss. This dual approach ensures that if one method encounters failure or interruption, data can still be processed and analyzed post flight. 
 
@@ -71,7 +86,7 @@ While flash memory can only be analyzed post flight, LoRa communications provide
   \caption{High-level functional flowchart of data sampling and logging}\label{fig:flowchart-high_level}
 \end{figure}
 
-Only Raw data will be collected and transmitted from each sensor register during flight. The aim of this approach is to optimize data collection and transmission rather than processing which will be conducted post flight. By doing so, onboard processing will be minimized, reducing the risk of processing errors and ensuring efficient utilization of LoRa bandwidth and onboard flash memory. 
+The design outlined in Figure~\ref{fig:flowchart-high_level} is focused solely on the capture, storage, and transmission of data. During flight, real-time processing algorithms will additionally be run to combine the raw sensor data and provide accurate and relevant data for the airbrake subsystem control.
 
 During the high-resolution interval, the system reads data from an IMU (Inertial Measurement Unit) which consists of an accelerometer, gyroscope, and magnetometer sensors. These sensors are essential in determining the aircraft motion and orientation; therefore, a higher sampling rate is required to capture subtle changes accurately. Raw data from sensor registers are then combined with header to form a data frame which will be stored in a buffer array ready to be stored in flash. Sensor data will additionally be kept in RAM to be transmitted during the low-resolution interval.  
 
@@ -141,9 +156,9 @@ The payload of each dataframe will consist of consecutive groupings of sensor da
 Code that processes this data will need to read in each dataframe from memory, using the length field in the header to delimit where the data ends. Based on the type information from the frame header, each variable of data can then be read.
 
 \section{Synchronisation}\label{sec:synchronisation}
-According to the Blue Raven user's guide \cite{adamson_2023}, synchronisation between high and low resolution data is achieved through a "sync code" that is stored with the data. This code is essentially a counter that increments with each millisecond, with overflow at a count of 250. 
+According to the Blue Raven user's guide \cite{adamson_2023}, synchronisation between high and low resolution data is achieved through a "sync code" that is stored with the data. This code is essentially a counter that increments with each millisecond, wrapping at a count of 250. 
 
-To maintain synchronisation both with datasets collected by Aurora V avionics, as well as with the Blue Raven data (for the sake of comparison), an identical solution will be implemented within the logging system. As outlined in Section~\ref{sec:dataframe-structure}, this sync code is included as a full byte in the frame header, following the id and frame length. This byte will be included with all forms of saved data to maintain synchronisation parity across the board.
+To maintain synchronisation both with datasets collected by Aurora V avionics, as well as with the Blue Raven data (for the sake of comparison), an identical solution will be implemented within the logging system. As outlined in Section~\ref{sec:dataframe-structure}, this sync code is presented as a full byte in the frame header, following the id and frame length. This byte will be included with all forms of saved data to maintain synchronisation parity across the board.
 
 \subsection{Mid-flight processing}
 
@@ -152,9 +167,9 @@ From an occupational health and safety perspective, the risks associated with th
 
 While these interactions may introduce physical hazards such as the risk of electrical shocks or injury from handling equipment, hardware is to be handled in RMIT Laboratory rooms where proper procedures and PPE will be utilized. Hardware will also be regularly inspected and maintenance to help identify and address potential safety hazards proactively.  
 
-As data analysis and verification is heavily reliant on the avionic hardware, there are foreseeable risks that may impact how data analysis and verification is approached. Table~\ref{tab:risk} outlines possible risks and contingency strategies to ensure project deliverables are met.  
+As data analysis and verification is heavily reliant on the avionic hardware, there are foreseeable risks that may impact how data analysis and verification is approached. Table~\ref{tbl:risk} outlines possible risks and contingency strategies to ensure project deliverables are met.  
 
-\begin{table}[]
+\begin{table}[h]
 \centering
 \begin{tabular}{>{\raggedright}p{4cm}p{1.5cm}p{1.5cm}p{7cm}}
 \toprule
@@ -190,7 +205,7 @@ Integration Challenges with ground communication and real-time processing & Medi
 \end{itemize}\\
 \bottomrule
 \end{tabular}
-\caption{Risk assessment}\label{table:risk}
+\caption{Risk assessment}\label{tbl:risk}
 \end{table}
 
 \subsection{Ethical considerations}
