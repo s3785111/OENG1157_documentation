@@ -2,21 +2,24 @@
 
 \usepackage{pgfplots}
 \usepackage{bookmark}
+\usepackage{longtable}
 \usepackage{booktabs}
 \usepackage{array}
-\usepackage{hyperref}
 \usepackage{enumitem}
 \usepackage{graphicx}
 \usepackage{wrapfig}
 \usepackage{listings}
 \usepackage{amsmath}
 \usepackage{bytefield}
+\usepackage{siunitx}
+\usepackage{hyperref}
 
 \setlength\cftchapterindent{\cftsectionindent}
 \setlength\cftbeforechapterskip{0pt}
 \setafterparaskip{1ex}
 \setbeforeparaskip{-\beforeparaskip}
 \renewcommand\cftchapterpagefont{\normalfont}
+\setsecnumdepth{paragraph}
 
 \renewcommand{\cftchapterleader}{\cftdotfill{\cftdotsep}}
 
@@ -51,7 +54,6 @@
 \renewcommand{\tocheadstart}{}
 \renewcommand{\aftertoctitle}{}
 \renewcommand{\printtoctitle}[1]{}
-\setcounter{secnumdepth}{3}
 \setcounter{tocdepth}{3}
 
 \makeatletter
@@ -76,6 +78,14 @@
   \fi}
 \makeatother
 
+\usetikzlibrary{shapes.geometric, arrows}
+
+\tikzstyle{start} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=green!30]
+\tikzstyle{stop} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=red!50]
+\tikzstyle{process} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=orange!80, text=white]
+\tikzstyle{decision} = [diamond, minimum width=3cm, minimum height=3cm, text centered, draw=black, fill=blue!50, text=white]
+\tikzstyle{arrow} = [thick,->,>=stealth, draw=blue, text=blue]
+
 \definecolor{bittersweet}{rgb}{1.0, 0.44, 0.37}
 \definecolor{aquamarine}{rgb}{0.5, 1.0, 0.83}
 \definecolor{lavender}{rgb}{0.9, 0.9, 0.98}
@@ -97,7 +107,7 @@
 \setlist[questions,2]{label=(\alph*),ref=\thequestionsi(\alph*)}
 
 \begin{document}
-  \titleAM{Dr. Glenn Matthews}{1}{Progress Report}{\semester{1}{2024}}
+  \titleAM{Dr. Glenn Matthews}{2}{Progress Report}{\semester{1}{2024}}
   \begin{align*}
     &\text{Name} &\text{Student No.} &&\text{Contribution}\\
     \student{Matthew Ricci}{s3785111}{50\%}\\
@@ -112,7 +122,7 @@
   \input{content}
 
   \bibliographystyle{ieeetr}
-  \bibliography{proposal}
+  \bibliography{PR1}
 
   \input{appendix}
 \end{document}

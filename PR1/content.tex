@@ -1,11 +1,9 @@
 
 \addcontentsline{toc}{section}{\textbf{Summary}}
 \begin{abstract}
-  \noindent\begin{itemize}
-    \item Brief Overview of the Project (What problem is it solving, overall aims.) 
-    \item Apogee of 10,000 ft  
-  \end{itemize}
-  \addcontentsline{toc}{subsection}{Key Milestones}\paragraph{Key Milestones} 
+  RMIT's high velocity rocket team (HIVE) this year is participating in the Australian Univercity Rocket Competition (AURC) under the 10,000ft category. As part of this competition HIVE proposed the completion of five rockets, given the name Aurora, with an iterative design approach working towards the fifth and final rocket that will fly as the competition entry vehicle. The Data Analytics and Verification team, a division of the avionics subsystem, was assembled for the purpose of producing the tools and implementation of both real-time and offline data processing systems that will run as a part of the rocket's avionics, as well as designing the verification routines to ensure proper testing procedure.
+  \paragraph*{Key Milestones} 
+  %TODO
   \begin{itemize}
     \item Summary of Progress to Date (Key milestones reached) 
     \item Key Insights and Preliminary Findings 
@@ -13,16 +11,19 @@
     \item Outline of Future Work? ( Next steps and or focus points).  
   \end{itemize}
 
-  \addcontentsline{toc}{subsection}{Aurora I launch outcomes}\paragraph{Aurora I launch outcomes}
-  The Aurora I rocket launched successfully on the 14th of April. Aurora I launched with a custom Avionics bay which included two Blue Ravens and custom PCB board which contained an Arduino Nano, sensor suite and flash storage. From a Data analytics and verification perspective, the following outlines key outcomes and findings:
+  \paragraph*{Aurora I launch outcomes}
+  The Aurora I rocket launched successfully on the 14th of April. Aurora I launched with a custom Avionics bay which included two commercial flight computers (Blue Raven) and a custom electronics system which contained an Arduino Nano, sensor suite and flash storage. From a Data analytics and verification perspective, the following outlines key outcomes and findings:
   \begin{itemize}
     \item Implementation: Custom firmware and libraries were created for the for Arduino Nano.  
-    \item Data collection: Data from sensor suite was captured with the exclusion of the barometer.  
+    \item Data collection: Most data was successfully collected and stored by the system, however there was no available barometric data post-flight.
     \item Flash storage retrieval: Data was extracted from the on-board flash storage upon recovery.  
     \item Preliminary data validation: Initial comparison of sensor data with the Blue Raven recordings indicated general agreement in acceleration, velocity, and attitude trends. 
   \end{itemize}
 
-  \addcontentsline{toc}{subsection}{Aurora II launch outcomes}\paragraph{Aurora II launch outcomes} Baz
+  \paragraph*{Aurora II launch outcomes} 
+  Aurora II launched a week prior to submission of this report, on Sunday the 26th of May. The rocket built for this launch was for the most part unchanged from Aurora I, with the original avionics system being re-flown with adjustments to ensure correct collection and storage of barometric data, in addition to ground communication hardware for preliminary telemetry testing from the Redundant Systems and Ground Communications team. 
+
+  As of the date of submission, data collected by the avionics system during this flight has yet to be retrieved. Once the data is available it will be applied for verification of the developed analysis tools and processing algorithms that will be further discussed later in the report.
 \end{abstract}
 
 
@@ -68,8 +69,28 @@ The project timeline is subject to limitations and constraints, most notably the
 While real-time data transmission is a goal, the primary focus is on ensuring reliable data logging for post-flight analysis and iterative improvement. This project scope is deliberately flexible to accommodate the iterative nature of rocket development. As new challenges and opportunities arise with each launch, the scope may be adjusted accordingly to ensure the successful completion of the project. 
 
 \section{Literature Review}
+During flight, the avionics subsystem is required to track various parameters of the rocket's state, both for the purposes of telemetry and for application in algorithms implemented by other on-board systems. In particular, it is imperative for the operation of the rocket's aerobrakes and recovery systems that accurate information concerning the upward velocity and altitude above ground are provided.
+
+To determine these parameters, hardware sensors will be accessible for sampling both barometric and inertial data during flight. Importantly, accelerometers and gyroscopes provide information on the vehicle flight dynamics while a barometer samples pressure data that can be applied in calculation of vertical displacement. As the rocket's body axis during flight rotates off the global vertical, measurements from the accelerometer diverge from the true values. To account for this, attitude information that is calculated from the gyroscope is applied to rotate the data back to the global frame of reference.
+
+\subsection{State Estimation}
+A naive approach to state calculation would involve the numerical integration of sensor data to the required measurements. At a high level, MEMS (micro-electromechanical system) gyroscopes output axial data with units of degrees per second, and accelerometers provide acceleration measured in $\unit{G}$'s per second; Integrating these measurements, in theory, would result in the calculation of per-axis velocity and angular position. In reality, MEMS sensors are prone to drift from various noise sources~\cite{Diao2013, Pang2001} that results in error offsets which propagate with the integral summation. In addition, the mathematical constructs and operations that are utilised in these calculations can have a profound effect on the resulting output, particularly in the case of attitude determination from gyroscopic data.
+
+Included amongst the most common representations of rotation in three dimensional space are Euler angles. These values are commonly referred to as \textit{roll}, \textit{pitch} and \textit{yaw}, and provide a convenient mapping of rotation to three spacial dimensions that correlate to the physical world, allowing intuitive understanding of the resulting metrics. While pleasant for human parsing, Euler angles are susceptible to difficulties that limit their application in attitude determination. In particular, the issues of rotational singularity and the strictness of their sequential nature complicates their implementation in the necessary calculations~\cite{Hemingway2018, Diebel2006}.
+
+Alternatively, though complex in their mathematical structure, unit quaternions provide a more flexible representation of rotation that is not limited by these factors~\cite{Diebel2006}. Furthermore, quaternion rotations are easily compatible with Euler angles and can be integrated just as easily, allowing for more accurate instantaneous rotational calculations. It is also documented that the Blue Raven altimeter, to which the Aurora avionics system in large part emulates, makes use of quaternions for its attitude estimation~\cite{Adamson2023, Adamson2023timeseries}
+
+Existing rocket designs such as Pioneer Rocketry's Skybreaker~\cite{Pioneer2016} and University of Calgary's Atlantis II~\cite{Atlantis2018} make use of Kalman Filter implementations when detecting apogee, fusing data both from barometric and inertial sensors.
+
+\subsection{Real-Time Operating Systems}
+The choice of an operating system (OS) for the avionics in Aurora V impacts system complexity, real-time performance, and resource utilisation. While bare-metal programming, where software directly interacts with hardware, offers simplicity and minimal overhead, it can become unmanageable as system complexity increases. As the number of processes increases, the harder it is to track timer and handle interrupts. This approach is suitable for resource constrained systems and has been employed in various amateur rocketry projects. Although Aurora I uses a bare-metal approach due to its simplistic hardware configuration, Aurora III and moving forward will introduce additional avionics processes such as communication between aerobrakes and payload and ground communications, outlined in section [].  
+
+The growing sophistication of model rocket avionics, as seen in projects like the Atlantis II, which employed FreeRTOS \cite{Atlantis2018}, has led to increased interest in Real-Time Operating Systems (RTOS) \cite{Di2018}. RTOS are specifically designed to handle real-time applications that require predictable timing behavior. An RTOS, such as FreeRTOS or VxWorks, provides features like prioritised thread scheduling, real-time clocks, and inter-process communication mechanisms that facilitate the development of reliable and responsive avionics software \cite{Dietrich2017}. For instance, the use of RTOS in embedded control systems like quadrotor flight controllers has demonstrated significant improvements in managing event latencies \cite{Di2018}. RTOS can abstract much of the complexity involved in timing and resource management, which allows developers to focus on application-specific logic. Additionally, the use of RTOS in the Atlantis II project highlights the need for a more structured software architecture as avionics systems incorporate multiple sensors, actuators, and communication interfaces.  
+
+A Hybrid approaches may be considered which combine the benefits of both bare-metal and RTOS systems by integrating custom RTOS functionalities directly into hardware. This method reduces the overhead typically associated with full-blown RTOS, while still providing necessary real-time capabilities [3]. Such approaches have been shown to enhance performance by reducing interrupt lock times and memory usage, which is particularly beneficial in resource constrained environments such as the Aurora V.  
+
 \section{Methodology and Engineering Design}
-This section primarily outlines the engineering designs for Aurora I and Aurora III, detailing the progression of the avionics system across these developmental stages. Aurora II, a re-flight of Aurora I, utilised the same avionics board to capture additional barometer data as this data had been missing from the first flight, with no major changes made to its design. As these designs are implemented, testing and verification of hardware is to take place. This encompasses both individual component testing and sub system integration testing, which is outlined in Section 4.4. 
+This section primarily outlines the engineering designs for Aurora I and Aurora III, detailing the progression of the avionics system across these developmental stages. Aurora II, a re-flight of Aurora I, utilised the same avionics board to provide further data for analysis and testing of derived algorithms, with no major changes made to its design. As these designs are implemented, testing and verification of hardware is to take place. This encompasses both individual component testing and sub system integration testing, which is outlined in Section 4.4. 
 
 \subsection{Aurora I }
 Due to delays in hardware availability from vendors, the Aurora I avionics system resorted to “bare-bones" design, incorporating only essential components that were readily available. Although not ideal to the original Aurora I plan, the outcome still enabled the team to test fundamental functionalities including sensor data capture and writing data to flash storage. While limited in scope, the Aurora I design served as a stepping stone for subsequent iterations, providing initial data for post flight analysis. 
@@ -89,6 +110,83 @@ The primary objectives of the Aurora I avionics system were to:
 \end{itemize}
 
 \subsubsection{Software Architecture}
+The above high-level flow chart in Figure 1 depicts how the Aurora I avionics system captures and transmits. The primary goal is to facilitate post-flight analysis and verification, aligning with the data collection intervals of the Blue Raven system ($\SI{500}{\hertz}$ high-resolution and $\SI{50}{\hertz}$ low-resolution). Data logging is initiated by a launch event detected from the Blue Raven. During flight, raw sensor data is stored onboard in flash memory and transmitted via LoRa to ground communications, ensuring redundancy. While flash memory analysis is limited to post-flight, LoRa provides real-time monitoring capabilities. 
+
+\subparagraph{High-Resolution Data Capture}
+
+The high-resolution interval ($\SI{500}{\hertz}$) focuses on data from an Inertial Measurement Unit (IMU), comprising accelerometer, gyroscope, and magnetometer sensors. This high sampling rate is used to accurately capture subtle changes in aircraft motion and orientation. Raw data from sensor registers is combined with headers into data frames, stored in a buffer, and then written to flash memory. 
+
+\subparagraph{Low-Resolution Data Capture and Transmission}
+
+The low-resolution interval ($\SI{50}{\hertz}$) reads data from a barometer (pressure and temperature sensor) to determine altitude. Similar to the high-resolution process, raw data is framed and temporarily stored in a buffer before writing to flash. In this interval, both flash writing and LoRa transmission of the data occur. 
+
+\subparagraph{Design Considerations and Implementation}
+
+Alternative design approaches were considered, including a separate logging interval. However, the chosen design simplifies the system by consolidating flash writing and LoRa transmission into the low-resolution interval. This streamlines data handling tasks while still meeting the core requirements. Although LoRa communications was included in the initial Aurora I software design, the hardware to support this was unavailable at the time due to delays in hardware delivery. As a result, testing for LoRa communications organised to be implemented in Aurora II.  
+
+\paragraph{Data Storage and Handling}
+
+To support post-flight data processing, the sensor data is logged in a structured format using dataframes. This structured approach ensures that the host system can easily recognise and interpret the different types of data being read. 
+
+\subparagraph{Data frame Structure}
+
+Each dataframe consists of a two-byte header and a payload. The header identifies the type of data recorded (e.g., high-resolution, low-resolution, or payload data), specifies the number of bytes in the payload, and includes a synchronisation byte for post-processing alignment. The payload contains the raw sensor data, organised in a specific order depending on the data type.  
+
+To optimise storage efficiency and simplify implementation, the dataframes are stored in a \verb|uint8_t| buffer, where each byte represents an 8-bit unsigned integer. This choice is driven by the fact that some sensor data is 24-bits per sample and using 8-bit nibbles allows for efficient space utilization while maintaining simplicity. 
+
+\begin{figure}[h]
+  \begin{center}\hspace{4.5em}
+  \begin{bytefield}[bitwidth=2em, endianness=big]{8}
+    \bitheader{0,5,6,7}\\
+    \begin{rightwordgroup}{Header}
+      \bitbox{2}[bgcolor=bittersweet]{ID} 
+      \bitbox{6}[bgcolor=aquamarine]{length}\\
+      \wordbox{1}[bgcolor=aquamarine]{Sync} 
+    \end{rightwordgroup}\\
+    \begin{rightwordgroup}{Payload}
+      \wordbox{1}{$D_0$[15:8]}\\
+      \wordbox{1}{$D_0$[7:0]}\\
+      \wordbox{1}{$D_1$[15:8]}\\
+      \wordbox[lrt]{1}{}\\
+      \cskippedwords{blue!20}\\
+      \wordbox[lrb]{1}{}\\
+      \wordbox{1}{$D_n$[7:0]}
+    \end{rightwordgroup}
+  \end{bytefield}
+  \end{center}
+  \caption{Dataframe structure for avionics}
+  \label{fig:dataframe-structure}
+\end{figure}
+
+\subparagraph{Data Typing}
+
+The data stored by the avionics system retains the raw structure as output by the onboard sensors, written as 8-bit unsigned blocks. This minimises storage requirements and avoids computational overhead during flight. Post-flight analysis can then convert this raw data into meaningful values by applying sensor-specific scaling factors and unit conversions. 
+
+\begin{figure}[h]
+  \begin{center}\hspace{4.5em}
+  \begin{bytefield}[endianness=big]{16}
+    \bitheader{0,15}\\
+    \begin{rightwordgroup}{X-axis}
+      \bitbox{8}[]{Upper nibble} 
+      \bitbox{8}[]{Lower nibble} 
+    \end{rightwordgroup}\\
+    \begin{rightwordgroup}{Y-axis}
+      \bitbox{8}[]{Upper nibble} 
+      \bitbox{8}[]{Lower nibble} 
+    \end{rightwordgroup}\\
+    \begin{rightwordgroup}{Z-axis}
+      \bitbox{8}[]{Upper nibble} 
+      \bitbox{8}[]{Lower nibble} 
+    \end{rightwordgroup}
+  \end{bytefield}
+  \end{center}
+  \caption{Example structure for a single sensor payload}
+  \label{fig:payload-structure}
+\end{figure}
+
+\paragraph{Synchronisation}
+
+Synchronisation between high- and low-resolution data, as well as with the Blue Raven data, is achieved using a "sync code”. Based off the Blue Raven data user guide, this code is a counter that increments every millisecond, wrapping around at 250. By including this sync code in the header of each dataframe, the system ensures that data from different sources can be accurately aligned and compared during post-flight analysis. As detailed in Section 4.1.3.2, this sync code is included as a full byte in the frame header, following the ID and frame length. This byte will be added into all saved data to ensure synchronisation consistency across all datasets
 
 \subsection{Aurora III}
 \subsubsection{Avionics Design Overview}
@@ -111,34 +209,275 @@ The Aurora III avionics software will undergo a significant architectural shift 
 
 To implement RTOS, Aurora III will use FreeRTOS, an open-source RTOS known for its effectiveness and real-time capabilities. FreeRTOS provides a multitasking kernel that enables task scheduling, priority-based execution, and efficient task communication. This allows the avionics system to handle time-critical operations effectively while maintaining overall system responsiveness. The following flowchart provides a high-level overview of the tasks executed by the RTOS sorted by their priority. 
 
+\begin{figure}[ht!]
+  \begin{center}
+    \hspace{-3.5cm}\includegraphics[width=0.65\textwidth]{./img/Section_4_2_2.jpeg}
+  \end{center}
+  \caption{Aurora III RTOS task architecture}\label{fig:}
+\end{figure}
+
+
 \paragraph{High Resolution Data Acquisition}
+\begin{figure}[ht!]
+  \begin{center}
+    \hspace{-3.5em}\includegraphics[width=0.85\textwidth]{./img/Section_4_2_2_1.jpeg}
+  \end{center}
+  \caption{High resolution task flowchart}\label{fig:flowchart-high_res}
+\end{figure}
+
+The High-Resolution Data Acquisition task is a high priority process within the Aurora III avionics system, responsible for capturing raw sensor data from the gyroscope, accelerometer, and magnetometer at a rate of 250 Hz. This high sampling rate enables the tracking of rapid changes in inertial measurements to determine precise attitude and movement estimation. 
+
+The tasks read raw data from the gyroscope and magnetometer, storing it in RAM and sets a sensor error flag if any sensors are not operational. These flags trigger the microcontroller to switch to redundant sensors in the I/O monitor task. The task then calculates the rocket's orientation using quaternions, derived from the raw gyroscope and accelerometer data. These quaternions, along with the raw sensor data, are packaged into a high-resolution data frame, complete with a header containing the data type and synchronisation information. 
+
+Finally, this data frame is added to a circular buffer, serving as temporary storage before being written to flash memory.  
+
+ 
 \paragraph{Low Resolution Data Acquisition}
+\begin{figure}[ht!]
+  \begin{center}
+    \includegraphics[width=0.95\textwidth]{./img/Section_4_2_2_2.jpeg}
+  \end{center}
+  \caption{Low resolution task flowchart}\label{fig:flowchart-low_res}
+\end{figure}
+
+The Low Resolution Data Acquisition task is responsible for collecting data from the barometer at a rate of $\SI{50}{\hertz}$. This task reads the raw barometer data, calculates altitude and velocity, applies a Kalman filter to smooth the data, and then creates a low-resolution data frame. Altitude and velocity are be used to inform aerobrakes and recovery. The data frame is then added to a buffer for subsequent writing to flash memory. Similar to the high resolution task, a sensor error flag is to be set if the barometer has malfunctioned.  
+
 \paragraph{State Update and Event Logging}
-\paragraph{I/O Monitorin}
+\begin{figure}[ht!]
+  \begin{center}
+    \includegraphics[width=0.95\textwidth]{./img/Section_4_2_2_3.jpeg}
+  \end{center}
+  \caption{State and event system flowchart}\label{fig:flowchart-event}
+\end{figure}
+
+The State Update and Event Logging task is responsible for tracking the rocket's state throughout the flight and logging significant events. It begins by enabling the pre-launch state and then transitions to the launch state when acceleration exceeds 5Gs. It then sends velocity and altitude data to the Aerobrakes subsystem via CAN if the measured velocity is decreasing. The task then continuously monitors velocity and altitude to detect apogee, which is defined as a decrease in velocity, or a combination of altitude drop, tilt angle above $\SI{90}{\degree}$, and negative velocity. Upon reaching apogee, the task sends a signal to trigger E-matches. Finally, the task transitions to the descent state when the altitude drops below $\SI{1300}{}$ft. Throughout the flight, the task adds event data frames to the buffer to record the occurrence of key events for post flight analysis.  
+
+\paragraph{I/O Monitoring}
+\begin{figure}[ht!]
+  \begin{center}
+    \hspace{-3.5cm}\includegraphics[width=0.65\textwidth]{./img/Section_4_2_2_4.jpeg}
+  \end{center}
+  \caption{I/O monitoring flowchart}\label{fig:flowchart-IO}
+\end{figure}
+
+The I/O Monitor Task is a low-priority task responsible for overseeing the status and functionality of the avionics system's input/output operations. Its primary function is to detect and manage potential errors or malfunctions in the sensors and the slave microcontroller. 
+
+The task continuously checks if the slave microcontroller is operational. If the slave microcontroller is not responding, the I/O Monitor Task takes corrective action by resetting it to restore normal operation. Additionally, the task monitors error flags set by the sensor data capture tasks. If any sensor error is detected, the I/O Monitor Task initiates a switch to the redundant sensor. 
+
 \paragraph{LoRa Communications}
+LoRa communications work is to be conducted by the ground stations team. However, this task is a lower priority task, responsible for transmitting data from the rocket to the ground station. It waits for a signal from the State Update and Event Logging task to begin transmission. 
+
+Once triggered, it sends data packets over the LoRa link, including sensor data, state information, and event logs. This real-time data transmission allows for ground-based monitoring and analysis of the rocket's performance during flight. 
+
 \paragraph{Memory Flashing}
+\begin{figure}[ht!]
+  \begin{center}
+    \hspace{-1.5cm}\includegraphics[width=0.75\textwidth]{./img/Section_4_2_2_5.jpeg}
+  \end{center}
+  \caption{Data storage flowchart}\label{fig:flowchart-flash}
+\end{figure}
+
+The Write to Flash Memory task is also low priority process that manages the storage of data frames in the onboard flash memory. It uses a mutex lock to ensure exclusive access to the flash memory, preventing conflicts with other tasks. The task checks if there are enough data frames in the circular buffer to fill a page (256 bytes). If so, it extracts the data frames from the buffer, writes them to flash memory, and updates the buffer position. This process is to repeat in the background unless a higher priority task requires the CPU time or until the flight ends.  
 
 \subsection{Data Processing and Analysis}
-\subsubsection{Post Flight Analysis}
-\subsubsection{Real-Time Processing}
+Development of data processing tools and algorithms was in large part a significant challenge within the progression of the project. These systems were developed offline first, mostly through the implementation of scripts built with Python, through analysis of the data that was collected after the flight of Aurora I. 
 
-\subsection{Data Visualisation}
+This section outlines these systems as they were designed, and how they were and will continue to be applied for the analysis of data throughout future Aurora rockets.
+
+\subsubsection{Attitude Estimation}
+As touched on in the literature review, it is important that the rocket maintains some representation of its orientation relative to a global frame of reference during the flight. Since the accelerometers included within the available sensor suite are only able to perform inertial measurement relative to the body axis of the vehicle, the rotational information is applied to rotate and scale these values to determine a true vertical acceleration to apply in further calculations.
+
+The instantaneous angular rate measurements output by the gyroscopic sensors can be considered as time derivatives of the Euler angle representation of the rocket's attitude. As such, by constructing rotation quaternions from these instantaneous rates and applying the rotation to the previously determined attitude (simply the last calculated rotation quaternion), effectively a numerical integration process is applied:\\[0.5em]
+{
+\setlength{\belowdisplayskip}{5pt}%
+\setlength{\abovedisplayskip}{-15pt}%
+\begin{align*}
+  \intertext{First the angular rates in $\unit{\degree}/\unit{\second}$ are converted to Euler angles (radians):}\\
+  \begin{bmatrix}
+    \phi\\\Theta\\\psi
+    \end{bmatrix} &= \frac{\pi}{180}\cdot\begin{bmatrix}
+                                        \omega_x\\\omega_y\\\omega_z
+                                        \end{bmatrix}\\
+    \intertext{A unit quaternion is then initialised through the half Euler angles (per equation 66 ~\cite{Diebel2006})}\\
+    \dot q &= 
+    \begin{bmatrix}
+      c_{\omega_x/2}c_{\omega_y/2}c_{\omega_z/2}-s_{\omega_x/2}c_{\omega_y/2}s_{\omega_z/2}\\
+      c_{\omega_x/2}c_{\omega_y/2}c_{\omega_z/2}+s_{\omega_x/2}s_{\omega_y/2}s_{\omega_z/2}\\
+      c_{\omega_x/2}s_{\omega_y/2}s_{\omega_z/2}-s_{\omega_x/2}c_{\omega_y/2}s_{\omega_z/2}\\
+      c_{\omega_x/2}c_{\omega_y/2}s_{\omega_z/2}+c_{\omega_x/2}c_{\omega_y/2}s_{\omega_z/2}\\
+    \end{bmatrix}\\[0.5ex]
+    \intertext{Where $c_x=\cos{x}$, $s_x=\sin{x}$. Then from equation 102~\cite{Diebel2006}:}\\
+    q_{k} &= q_{k-1}\cdot\dot q\\
+          &= \begin{bmatrix}
+            (q_{{k-1}_0} * \dot q_0) + (-q_{{k-1}_1} * \dot q_1) + (-q_{{k-1}_2} * \dot q_2) + (-q_{{k-1}_3} * \dot q_3)\\
+            (q_{{k-1}_0} * \dot q_1) + (q_{{k-1}_1} * \dot q_0) + (q_{{k-1}_2} * \dot q_3) + (-q_{{k-1}_3} * \dot q_2)\\
+            (q_{{k-1}_0} * \dot q_2) + (-q_{{k-1}_1} * \dot q_3) + (q_{{k-1}_2} * \dot q_0) + (q_{{k-1}_3} * \dot q_1)\\
+            (q_{{k-1}_0} * \dot q_3) + (q_{{k-1}_1} * \dot q_2) + (-q_{{k-1}_2} * \dot q_1) + (q_{{k-1}_3} * \dot q_0)
+             \end{bmatrix}\\
+    \intertext{Finally, normalise the quaternion to $[-1,1]$:}\\
+    q_{normal} &= q_{k} / \sqrt{q_{k_0}^2 + q_{k_1}^2 + q_{k_2}^2 + q_{k_3}^2}
+\end{align*}
+}\\
+
+\noindent The resulting quaternion as calculated through the integration of angular velocities then represents the rotation of the rocket body from its initial pose.
+
+\subsubsection{State Estimation (Velocity and Altitude)}
+
 \subsection{Testing Plan}
 \subsubsection{Verification}
-\subsubsection{Validation}
-\subsubsection{Operation}
+\let\olditemize=\itemize \let\endolditemize=\enditemize \renewenvironment{itemize}{\olditemize \itemsep-0.5em}{\endolditemize}
 
-\section{Aurora I&II Results and Analysis}
+\setlength\extrarowheight{-5em}
+\begin{longtable}{<{\raggedright}p{4cm}p{10cm}}
+\toprule Components & Test \\ \midrule
+Accelerometer (High G) & Shake table:  
+  \begin{itemize}
+    \item Subject the accelerometer to known vibration profiles (frequencies, amplitudes from A1 data) 
+    \item Verify output readings accurately reflect the applied vibrations.
+  \end{itemize} \\
+Accelerometer (Low G) & Shake table:  
+  \begin{itemize}
+    \item Subject the accelerometer to known vibration profiles (frequencies, amplitudes from A1 data) 
+    \item Verify output readings accurately reflect the applied vibrations. 
+  \end{itemize} 
+Saturation test:   
+  \begin{itemize}
+    \item Subject the accelerometer to vibration greater than the peak measurable by the sensor. 
+    \item Observe the behaviour of the sensor after saturation – how long it remains saturated, accuracy of the data after leaving saturation.  
+  \end{itemize}
+ Tilt test:  
+ \begin{itemize}
+  \item Slowly rotate the accelerometer across its measurement axes.
+ \end{itemize} \\
+Gyroscope & Rate table: 
+  \begin{itemize}
+    \item Mount gyroscope on a rate table that can rotate at different angular velocities. 
+    \item Verify output accurately measures the applied rotation rates in each axis. 
+  \end{itemize} 
+Bias stability: 
+  \begin{itemize}
+    \item Leave gyroscope sampling data intermittently over a long period of time (overnight) 
+    \item Measure average readings within a window of time at each interval, averaging the samples. 
+    \item Measure resulting drift over time from initial values
+  \end{itemize} \\
+Barometer & Vacuum chamber / temperature test:
+  \begin{itemize}  
+    \item Placing Barometer in a vacuum chamber and apply different pressure and temperature within a range relevant to expected flight altitudes.  
+    \item Verify readings accurately reflect the known pressure values.
+  \end{itemize} \\
+Magnetometer & Outdoor testing: 
+  \begin{itemize} 
+    \item Record data outdoors, with known changes in orientation. 
+    \item Compare against expected magnetic field values for your location.
+  \end{itemize} \\
+GPS & Outdoor testing: 
+  \begin{itemize}
+    \item Test in open locations under various conditions including stationary and while moving.  
+    \item Evaluate accuracy against known locations or compare against high-precision reference GPS.
+  \end{itemize} \\
+LoRa Communications & Transmission range: 
+  \begin{itemize} 
+    \item Test in different environments (clear line-of-sight and obstructed) to determine effective range.
+  \end{itemize} 
+ Data integrity:   
+ \begin{itemize}
+    \item Transmit known data packets and verify correct transmission.
+  \end{itemize}\\
+ Flash Storage & Retention test:  
+  \begin{itemize}
+    \item Write data, power off for certain amount of time and verify data remains readable.  
+\end{itemize} 
+ Flash write timing: 
+  \begin{itemize}
+    \item Write different test data vectors to flash and measure the time it takes. 
+    \item Perform tests with both full- and partial-page writes.
+  \end{itemize}
+ Flash read timing: 
+  \begin{itemize}
+    \item Read data back in from flash chip and measure the time it takes.
+  \end{itemize} \\
+Microcontroller & Code execution test:  
+  \begin{itemize}
+    \item Test program functions. 
+  \end{itemize} 
+ Continuity test:  
+ \begin{itemize}
+  \item Monitoring signals and pin behaviour using logic analysers and oscilloscopes.
+ \end{itemize}\\
+ \bottomrule
+\end{longtable}
+
+\subsubsection{Validation}
+
+\setlength\extrarowheight{-5em}
+\begin{longtable}{<{\raggedright}p{4cm}p{10cm}}
+\toprule
+Sub-Assemblies &
+  Test \\\midrule
+Recovery Assembly (Sensors, Mirco and GPS) & Data injection tests 
+  \begin{itemize}
+    \item Place system in a testing mode, connecting recovery outputs to some readable output (i.e. buzzer, LED). 
+    \item Feed in data collected from previous flights and determine if recovery system “fires” at the known apogee.
+  \end{itemize} \\
+  Gound Communications & Telemetry reception:  
+  \begin{itemize}
+    \item Test reception of data from Avionics Bay, ensuring that data is correctly being transmitted.
+  \end{itemize} \\
+Storage & Data logging:  
+  \begin{itemize} 
+    \item Validate that sensor data is correctly being stored in flash.
+  \end{itemize} \\
+Internal Communications (CAN bus) & Message integrity 
+  \begin{itemize}
+    \item Test transmission and reception of all expected message types over the CAN bus.
+  \end{itemize} \\
+State Estimation & Simulation:  
+\begin{itemize}
+  \item Use a simulator to input realistic sensor data. Verify state estimation algorithms correctly calculate state estimation.
+\end{itemize} \\
+SRAD Redundancy & Error injected testing:  
+\begin{itemize}
+  \item Testing for failover between primary and secondary systems.  
+  \item Place system in a testing mode, inject errata on communication lines (payload/aerobrakes CAN, SPI, etc.) 
+  \item Verify system correctly identifies sources of error and appropriately swaps to redundant system.
+\end{itemize} \\\bottomrule
+\end{longtable}
+
+\subsubsection{Operation}
+\begin{itemize}
+  \item Full Avionics integration testing  
+  \item Final Integration (Operational Testing) 
+\end{itemize}
+
+Prior to launch, a final ground test will be conducted using flight-like sensor data taken from A1 and A2 profiles. This test will run the Avionics system in "test mode" where simulated packets are transmitted, successful SRAD deployment is indicated through an LED, and aerobrake deployment is verified. This final check verifies correct data flow, decision-making logic, and functionality of both the recovery and aerobrakes systems. 
+
+\section{Aurora I\&II Results and Analysis}
 \subsection{Key Findings}
 \subsection{Verification Results}
 \subsection{Challenges and Refinements}
 
 \section{Project Management and Timeline}
 \subsection{Project Timeline}
+
 \subsection{Risk Assessment and Mitigation}
+Although the most risks were outlined in our proposal and risk assessment, it is worth noting that there will additional risk primarily from conducting verification and validation of hardware. To validate the avionics senor suite, a range of tools will be required which include, shake tables, vacuum chambers and rate tables. Such tools will be accessed through RMIT physics department and laboratory. 
+
+Currently, the team is working closely with technical officer Peter McGlynn to assist with providing access to the relevant tools. Although most tests will be relatively straight forward, the use of a vacuum chamber to test the barometer poses a safety concern. In addition to controlling a vacuum, it is planned to have a heat source to within the chamber to adjust the temperature, simulating the temperate increase in the rocket’s environment during flight. 
+
+It was suggested that toaster wires can be fed through the camber to do so. Creating and using such mechanism will be challenging, however all activity and equipment risk assessments will be completed before any validation testing is conducted.  
 
 \section{Discussion and Recommendations}
+
 \subsection{Critical Evaluation of Progress}
+The project is progressing well towards meeting its objectives and deliverables. The successful launch of Aurora I and the resulting data analysis have provided valuable insights into the performance of the avionics system and identified areas for improvement. The implementation of the RTOS in Aurora III will significantly enhance the system's ability to handle complex tasks and meet real-time requirements. 
+
+The data collection and logging processes are functioning as intended, and the initial validation tests have shown promising results. However, there are areas that require further attention. Although the RTOS implementation is feasible, this is the first time any team member has used an RTOS. Extensive testing and validation are required, ensuring that software design is operating in a flight environment as intended. 
+
+Additionally, the integration of the avionics system with the aerobrakes and payload subsystems also requires thorough testing and validation to ensuring aerobrake processes are triggered at the right time.  
+
 \subsection{Future Recommendations}
+The tight deadlines associated with rocket launches highlight the need for a more proactive approach to testing and validation. A more detailed plan regarding how and when testing of both individual components and integrated subsystems will need to outlined, which includes ground tests and simulations to identify and address potential issues before the rocket takes flight. 
+
+Furthermore, the delays in hardware highlight the importance of utilising simulation environments as testing platforms during waiting periods. Although some simulation was conducted, it is recommended to priorities tests, especially when using new techniques such as RTOS and real-time data processing.  
 
 \section{Conclusions}

@@ -1,0 +1,153 @@
+
+\addcontentsline{toc}{section}{\textbf{Summary}}
+\begin{abstract}
+  \noindent\begin{itemize}
+    \item Brief Overview of the Project (What problem is it solving, overall aims.) 
+    \item Apogee of 10,000 ft  
+  \end{itemize}
+  \addcontentsline{toc}{subsection}{Key Milestones}\paragraph{Key Milestones} 
+  \begin{itemize}
+    \item Summary of Progress to Date (Key milestones reached) 
+    \item Key Insights and Preliminary Findings 
+    \item Challenges faced and Mitigation Strategies 
+    \item Outline of Future Work? ( Next steps and or focus points).  
+  \end{itemize}
+
+  \addcontentsline{toc}{subsection}{Aurora I launch outcomes}\paragraph{Aurora I launch outcomes}
+  The Aurora I rocket launched successfully on the 14th of April. Aurora I launched with a custom Avionics bay which included two Blue Ravens and custom PCB board which contained an Arduino Nano, sensor suite and flash storage. From a Data analytics and verification perspective, the following outlines key outcomes and findings:
+  \begin{itemize}
+    \item Implementation: Custom firmware and libraries were created for the for Arduino Nano.  
+    \item Data collection: Data from sensor suite was captured with the exclusion of the barometer.  
+    \item Flash storage retrieval: Data was extracted from the on-board flash storage upon recovery.  
+    \item Preliminary data validation: Initial comparison of sensor data with the Blue Raven recordings indicated general agreement in acceleration, velocity, and attitude trends. 
+  \end{itemize}
+
+  \addcontentsline{toc}{subsection}{Aurora II launch outcomes}\paragraph{Aurora II launch outcomes} Baz
+\end{abstract}
+
+
+\section{Introduction}
+\subsection{Background and Significance}
+The Aurora V rocket, an L3 (Level 3) high-powered model rocket designed to reach an apogee of 10,000 feet, represents RMIT's entry in the 2024 Australian Universities Rocket Competition (AURC). To achieve a successful flight and meet the competition's requirements, real-time data collection, analysis, and verification is necessary. The Data Analytics and Verification team within the Avionics subsystem plays an important role in ensuring the rocket's performance, safety, and ultimately, the success of the mission. 
+
+Aurora V will be the fifth and final competition ready rocket as it represents the culmination of the Aurora project as a whole. Throughout the semesters, previous iterations of the rocket (Aurora I to Aurora IV) will be developed and designed which will act a stepping stone towards the final design. With each iteration, the data gathered will feed into data analytics and verification processes in hopes to optimise algorithms and refine sensor configurations.  
+
+The RMIT AURC team is multidisciplinary made up of five major sub systems including, Aerostructures, Avionics, Payload, Recovery and Aerobrakes totaling a team of 30 students. The Data analytics team is subset of the Avionics sub system and will provide insights into the rocket's flight dynamics, enabling real-time decision-making for critical systems like the airbrakes and switching over to failover systems. By analysing sensor data such as inertial measurements, barometric pressure, and temperature and through sensor fusion and filtering, an estimate of the rocket's position, velocity, and attitude can be measured. This information is mission critical for maintaining a stable trajectory towards the target apogee. Additionally, data verification and state estimations will be used to identify and mitigate potential errors or anomalies in the sensor readings, ensuring the reliability of the information used for flight control. 
+
+The significance of this project extends beyond the immediate 2024 AURC competition as it will act as a resource for future RMIT model rockets. The development data analytics and verification techniques for resource constrained embedded systems has a broader application in the aerospace industry and other fields where data analysis is critical key. The work completed through this capstone will provide future recommendations contributing to future work.  
+
+\subsection{Problem Statement}
+The primary challenge lies in designing and implementing firmware, data analytics and verification algorithms that can operate effectively within the limitations of the custom PCB board developed by the Aurora V's Avionics, Ground Communications and Redundant Systems team. This involves balancing the desire of captured sensor data and algorithms with the constraints of limited processing power, memory, and communication bandwidth. This subsystem’s primary objective is to design, test, and validate data analytics processes for the avionics, ground communications, redundant, electronic systems, and payload systems. 
+
+\subsubsection{Project Deliverables}
+Project deliverables and expected outcomes include:  
+\begin{itemize}
+  \item Data Capture and Logging Firmware Implementation: Defining sampling rates and intervals for data capture and establishing data logging and storing formats. 
+  \item Real-Time Processing: Research and develop algorithms for sensor fusion to integrate data from multiple sensors. Implement filtering techniques to remove noise. Provide accurate state estimation for the airbrake control system. 
+  \item Post-Processing: Perform statistical analysis to evaluate key performance metrics of avionics systems. Implement systems to detect deviations from expected behaviour when comparing raw sensor and fused data to the data captured by the blue raven. 
+  \item Data Visualization: Develop tools for generating informative graphs and charts for data interpretation. Explore the possibility of creating simulations based on collected data. 
+  \item Data Validation: Determine the validity of the captured sensor data.  
+\end{itemize}
+
+\subsubsection{Design/Research Questions}
+\subsubsection{Project Scope}
+The Data analytics team is subset of the Avionics sub system and will operate within the project scope that encompasses the following activities: 
+\begin{itemize}
+  \item \textbf{Software Development}: Writing, testing, and optimizing firmware for data collection, logging, and real-time processing. Development post data visualization and analysis. 
+  \item \textbf{Algorithm Design}: Researching and implementing algorithms for sensor fusion, filtering (Kalman filters), and state estimation. 
+  \item \textbf{Hardware Integration}: Integrating sensors, microcontrollers, and communication modules into the avionics system. 
+  \item \textbf{Testing and Validation}: Conducting ground tests and flight tests (Aurora I-V) to validate the performance and reliability of the data analytics and verification system. 
+  \item \textbf{Iterative Refinement}: Continuously improving the system based on data and feedback from each launch, culminating in a competition-ready solution for Aurora V.
+\end{itemize}
+
+\paragraph{Limitations and Constraints}
+The project focuses on the software and algorithmic aspects of data analytics and verification. Hardware design, development and initialisation of firmware fall under the Avionics Ground Communications and Redundant Systems team. 
+
+The project timeline is subject to limitations and constraints, most notably the lead time required for procuring essential hardware components. This delay highlights the focus on software and algorithmic development while awaiting hardware delivery. During this waiting period, the team is using Nucleo-f439zi development board to prototype and test firmware and algorithms in a simulated environment. Additionally, sensor and integration verification tests are being designed to assess the performance and accuracy of firmware once the hardware becomes available. Furthermore, the team is actively analysing data captured during the Aurora I and II flights. This analysis aims to gain valuable insights into sensor behaviour, noise characteristics, and potential areas for algorithm optimisation. The findings from this analysis will directly inform the development of state estimation and Kalman filter implementations for Aurora III. 
+
+While real-time data transmission is a goal, the primary focus is on ensuring reliable data logging for post-flight analysis and iterative improvement. This project scope is deliberately flexible to accommodate the iterative nature of rocket development. As new challenges and opportunities arise with each launch, the scope may be adjusted accordingly to ensure the successful completion of the project. 
+
+\section{Literature Review}
+During flight, the avionics subsystem is required to track various parameters of the rocket's state, both for the purposes of telemetry and for application in algorithms implemented by other on-board systems. In particular, it is imperative for the operation of the rocket's aerobrakes and recovery systems that accurate information concerning the upward velocity and altitude above ground are provided.
+
+To determine these parameters, hardware sensors will be accessible for sampling both barometric and inertial data during flight. Importantly, accelerometers and gyroscopes provide information on the vehicle flight dynamics while a barometer samples pressure data that can be applied in calculation of vertical displacement. As the rocket's body axis during flight rotates off the global vertical, measurements from the accelerometer diverge from the true values. To account for this, attitude information that is calculated from the gyroscope is applied to rotate the data back to the global frame of reference.
+
+A naive approach to state calculation would involve the numerical integration of sensor data to the required measurements. At a high level, MEMS (micro-electromechanical system) gyroscopes output axial data with units of degrees per second, and accelerometers provide acceleration measured in $\unit{G}$'s per second; Integrating these measurements, in theory, would result in the calculation of per-axis velocity and angular position. In reality, MEMS sensors are prone to drift from various noise sources\cite{Diao2013, Pang2001} that results in error offsets that propagate with the integral summation. In addition, the mathematical constructs and operations that are utilised in these calculations can have a profound effect on the resulting output, particularly in the case of attitude determination from gyroscopic data.
+
+Included amongst the most common representations of rotation in three dimensional space are Euler angles. 
+
+
+\section{Methodology and Engineering Design}
+This section primarily outlines the engineering designs for Aurora I and Aurora III, detailing the progression of the avionics system across these developmental stages. Aurora II, a re-flight of Aurora I, utilised the same avionics board to provide further data for analysis and testing of derived algorithms, with no major changes made to its design. As these designs are implemented, testing and verification of hardware is to take place. This encompasses both individual component testing and sub system integration testing, which is outlined in Section 4.4. 
+
+\subsection{Aurora I }
+Due to delays in hardware availability from vendors, the Aurora I avionics system resorted to “bare-bones" design, incorporating only essential components that were readily available. Although not ideal to the original Aurora I plan, the outcome still enabled the team to test fundamental functionalities including sensor data capture and writing data to flash storage. While limited in scope, the Aurora I design served as a stepping stone for subsequent iterations, providing initial data for post flight analysis. 
+
+\subsubsection{Avionics Design Overview}
+The Aurora I avionics system served as the initial prototype for data collection and recovery system testing. It consisted of two main components: 
+\begin{itemize}
+  \item Commercial Off-The-Shelf (COTS) Blue Raven Flight Computers: These flight computers were responsible for activating the recovery systems (drogue and main parachutes) and recording flight data for post-flight analysis. 
+  \item Custom Electronics Board: This board, built on a perfboard, housed an Arduino Nano microcontroller, a sensor suite (accelerometer, barometer, gyroscope, magnetometer), and a flash storage module. The Arduino Nano controlled the sensors and data storage, while the flash module provided onboard data storage. 
+\end{itemize}
+
+The primary objectives of the Aurora I avionics system were to: 
+\begin{itemize}
+  \item Gain experience and understanding of the COTS Blue Raven flight computers. 
+  \item Test various components of the avionics system, including battery types and sensor data collection. 
+  \item Gather flight data for post processing and analysis
+\end{itemize}
+
+\subsubsection{Software Architecture}
+
+\subsection{Aurora III}
+\subsubsection{Avionics Design Overview}
+The Aurora III avionics system is designed to manage power, acquire flight and payload data, facilitate internal vehicle communication, and enable vehicle-to-ground communication. However, when compared to Aurora I and Aurora II, it also plays an additional role in supporting the Aerobrakes subsystem by providing essential flight data which includes altitude and velocity. Ground communication through LoRa protocol will also be included within the systems, supporting live state estimates during flight. From a high-level perspective, the avionics system comprises two SRAD (Student-Research and Developed) flight computers, each equipped with its own sensor suite for redundancy. 
+
+A block diagram illustrating the high-level design of the avionics system is shown in Figure~X
+
+The system utilizes an STM32F439 microcontroller as its core processing unit. This microcontroller was chosen by the boarder team for its familiarity, sufficient clock speed, ample I/O pins, and built-in SPI/I2C and CAN bus functionality. The addition of LoRa communication enables real-time data transmission to the ground station, enhancing monitoring and analysis capabilities. The system also incorporates the ability to receive and send data to the payload and aerobrakes subsystems via the CAN 2.0A protocol, facilitating integrated control and decision-making during flight. 
+
+\subsubsection{Software Architecture}
+The Aurora III avionics software will undergo a significant architectural shift with the introduction of a Real-Time Operating System (RTOS). This decision was driven by the increased complexity of the avionics system compared to Aurora I. The addition of communication with the Aerobrakes and Payload subsystems, along with the need for precise timing and task prioritization, highlights the need for a more capable software framework. The engineering rationale for RTOS Implementation are as follows:  
+
+\begin{itemize}
+  \item \textbf{Increased System Complexity}: The Aurora III avionics system handles a wider range of tasks, including sensor data capture, state estimation, LoRa communication, inter-subsystem communication, flash storage management, and failover monitoring. An RTOS provides the necessary framework to manage these diverse tasks efficiently. 
+  \item \textbf{Real-Time Requirements}: Many avionics operations, such as sensor data sampling and state estimation calculations, have strict timing requirements. Timing is particularly critical for when the motor has burnt out and for when apogee has been reached as these events trigger critical actions in other subsystems. The detection of motor burnout signals the Aerobrakes subsystem to initiate its control sequence, while apogee detection triggers the deployment of recovery systems. Any delays in these actions could lead to mission failure or even jeopardize the safety of the rocket and its surroundings. An RTOS ensures that these time-critical tasks are executed within their deadlines, preventing potential failures due to missed timing constraints. 
+  \item \textbf{Task Prioritization}: An RTOS allows for the prioritization of tasks, ensuring that critical operations like sensor data acquisition and failover management take precedence over less urgent tasks like writing to flash and LoRa ground communications. 
+  \item \textbf{Efficient Task Communication}: The RTOS facilitates communication and synchronization between different tasks, enabling seamless data exchange and coordination between various components of the avionics system. 
+  \item \textbf{Feasibility}: The selected microcontroller, the STM32F439, has sufficient processing power and memory to support the overhead of an RTOS. Additionally, FreeRTOS, the chosen RTOS, is known for its lightweight and efficient, making it well-suited for embedded systems like the Aurora III avionics. 
+\end{itemize}
+
+To implement RTOS, Aurora III will use FreeRTOS, an open-source RTOS known for its effectiveness and real-time capabilities. FreeRTOS provides a multitasking kernel that enables task scheduling, priority-based execution, and efficient task communication. This allows the avionics system to handle time-critical operations effectively while maintaining overall system responsiveness. The following flowchart provides a high-level overview of the tasks executed by the RTOS sorted by their priority. 
+
+\paragraph{High Resolution Data Acquisition}
+\paragraph{Low Resolution Data Acquisition}
+\paragraph{State Update and Event Logging}
+\paragraph{I/O Monitorin}
+\paragraph{LoRa Communications}
+\paragraph{Memory Flashing}
+
+\subsection{Data Processing and Analysis}
+\subsubsection{Post Flight Analysis}
+\subsubsection{Real-Time Processing}
+
+\subsection{Data Visualisation}
+\subsection{Testing Plan}
+\subsubsection{Verification}
+\subsubsection{Validation}
+\subsubsection{Operation}
+
+\section{Aurora I\&II Results and Analysis}
+\subsection{Key Findings}
+\subsection{Verification Results}
+\subsection{Challenges and Refinements}
+
+\section{Project Management and Timeline}
+\subsection{Project Timeline}
+\subsection{Risk Assessment and Mitigation}
+
+\section{Discussion and Recommendations}
+\subsection{Critical Evaluation of Progress}
+\subsection{Future Recommendations}
+
+\section{Conclusions}
