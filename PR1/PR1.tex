@@ -112,6 +112,15 @@
 \setlist[questions,1]{label=RQ\arabic*.,ref=RQ\arabic*}
 \setlist[questions,2]{label=(\alph*),ref=\thequestionsi(\alph*)}
 
+\newcommand{\listquestionsname}{Research Questions}
+\newlistof{listofquestions}{qu}{\listquestionsname}
+\newcommand{\question}[1]{%
+	\addcontentsline{qu}{question}{\protect\numberline{\thequestionsi}#1}\par
+}
+\makeatletter
+\let\l@question\l@figure
+\makeatother
+
 \newcommand{\listequationsname}{List of Equations}
 \newlistof{listofequations}{equ}{\listequationsname}
 \newcommand{\myequation}[1]{%
@@ -130,8 +139,7 @@
   \end{align*}
   \addcontentsline{toc}{part}{Contents}
   \tableofcontents*
-  \listofequations
-
+  \listofquestions \listofequations
   \clearpage
   \renewcommand{\abstractname}{Summary}
 
