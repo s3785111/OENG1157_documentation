@@ -6,12 +6,19 @@
 \setlength{\beforechapskip}{0pt}
 \setlength{\afterchapskip}{0pt}
 \setlength{\footskip}{5cm}
-
-\clearpage
-\chapter{}\label{apdx:A}
 \setlrmarginsandblock{0.5cm}{0.5cm}{*}
 \setulmarginsandblock{0.25cm}{0.25cm}{*}
+\clearpage
 \checkandfixthelayout
+\chapter{}\label{apdx:A}
+\begin{minipage}{\textwidth}
+  \centering
+  \includegraphics[height=0.85\textheight]{./img/A1_high-level.png}
+\end{minipage}
+
+\clearpage
+\chapter{}\label{apdx:B}
+\vfill{}
 \begin{minipage}{\textwidth}
 \centering\includegraphics[width=0.45\textwidth]{./img/plot/accel/Accel_X-axis.png}
 \centering\includegraphics[width=0.45\textwidth]{./img/plot/accel/Accel_Y-axis.png}
@@ -20,3 +27,4 @@
 \centering\includegraphics[width=0.45\textwidth]{./img/plot/gyro/Gyro_Y-axis.png}
 \centering\includegraphics[width=0.45\textwidth]{./img/plot/gyro/Gyro_Z-axis.png}
 \end{minipage}
+\vfill{}
