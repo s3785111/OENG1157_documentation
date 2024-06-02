@@ -3,10 +3,20 @@
 \renewcommand{\chaptername}{Appendix}
 \addcontentsline{toc}{part}{Appendix}
 
-\clearpage
-\chapter{}\label{apdx:}
-\setlrmarginsandblock{0.5cm}{0.5cm}{*}
-\checkandfixthelayout
-\vfill{}
-\vfill{}
+\setlength{\beforechapskip}{0pt}
+\setlength{\afterchapskip}{0pt}
+\setlength{\footskip}{5cm}
 
+\clearpage
+\chapter{}\label{apdx:A}
+\setlrmarginsandblock{0.5cm}{0.5cm}{*}
+\setulmarginsandblock{0.25cm}{0.25cm}{*}
+\checkandfixthelayout
+{
+\centering\includegraphics[width=0.45\textwidth]{./img/plot/accel/Accel_X-axis.png}
+\centering\includegraphics[width=0.45\textwidth]{./img/plot/accel/Accel_Y-axis.png}
+\centering\includegraphics[width=0.45\textwidth]{./img/plot/accel/Accel_Z-axis.png}
+\centering\includegraphics[width=0.45\textwidth]{./img/plot/gyro/Gyro_X-axis.png}
+\centering\includegraphics[width=0.45\textwidth]{./img/plot/gyro/Gyro_Y-axis.png}
+\centering\includegraphics[width=0.45\textwidth]{./img/plot/gyro/Gyro_Z-axis.png}
+}
