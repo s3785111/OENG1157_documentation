@@ -4,6 +4,7 @@
 \usepackage{bookmark}
 \usepackage{tocloft}
 \usepackage{longtable}
+\usepackage{tabularx}
 \usepackage{booktabs}
 \usepackage{array}
 \usepackage{enumitem}
@@ -18,6 +19,7 @@
 \usepackage[backend=bibtex]{biblatex}
 \addbibresource{PR1.bib}
 \PassOptionsToPackage{hidelinks}{hyperref}
+\hypersetup{pdfborder=0 0 0}
 
 \newcommand{\uvec}[1]{\boldsymbol{\hat{\textbf{#1}}}}
 
@@ -131,6 +133,10 @@
 \let\l@equation\l@figure
 \makeatother
 
+\addtocontents{lot}{\vskip -1.2cm}
+\addtocontents{equ}{\vskip -1.2cm}
+\addtocontents{qu}{\vskip -1.2cm}
+
 \begin{document}
   \titleAM{Dr. Glenn Matthews}{2}{Progress Report}{\semester{1}{2024}}
   \begin{align*}
@@ -140,7 +146,8 @@
   \end{align*}
   \addcontentsline{toc}{part}{Contents}
   \tableofcontents*
-  \listofquestions \listofequations
+  \listofquestions 
+  \listofequations
   \clearpage
   \renewcommand{\abstractname}{Summary}
 

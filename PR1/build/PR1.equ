@@ -1,4 +1,5 @@
-\contentsline {chapter}{Kalman Filter}{19}{subsubsection.0.3.4.2}%
-\contentsline {equation}{\numberline {1}State transition model $A$}{19}{equation.0.3.1}%
-\contentsline {equation}{\numberline {2}Measurement model $H$}{19}{equation.0.3.2}%
-\contentsline {equation}{\numberline {3}Measurement $z$}{19}{equation.0.3.3}%
+\vskip -1.2cm
+\contentsline {chapter}{Kalman Filter}{17}{subsubsection.0.3.4.2}%
+\contentsline {equation}{\numberline {1}State transition model $A$}{17}{equation.0.3.1}%
+\contentsline {equation}{\numberline {2}Measurement model $H$}{17}{equation.0.3.2}%
+\contentsline {equation}{\numberline {3}Measurement $z$}{18}{equation.0.3.3}%
