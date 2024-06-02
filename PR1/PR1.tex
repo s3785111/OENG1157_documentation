@@ -2,6 +2,7 @@
 
 \usepackage{pgfplots}
 \usepackage{bookmark}
+\usepackage{tocloft}
 \usepackage{longtable}
 \usepackage{booktabs}
 \usepackage{array}
@@ -13,6 +14,11 @@
 \usepackage{bytefield}
 \usepackage{siunitx}
 \usepackage{hyperref}
+\usepackage{bm}
+\usepackage[backend=bibtex]{biblatex}
+\addbibresource{PR1.bib}
+
+\newcommand{\uvec}[1]{\boldsymbol{\hat{\textbf{#1}}}}
 
 \setlength\cftchapterindent{\cftsectionindent}
 \setlength\cftbeforechapterskip{0pt}
@@ -106,6 +112,15 @@
 \setlist[questions,1]{label=RQ\arabic*.,ref=RQ\arabic*}
 \setlist[questions,2]{label=(\alph*),ref=\thequestionsi(\alph*)}
 
+\newcommand{\listequationsname}{List of Equations}
+\newlistof{listofequations}{equ}{\listequationsname}
+\newcommand{\myequation}[1]{%
+	\addcontentsline{equ}{equation}{\protect\numberline{\theequation}#1}\par
+}
+\makeatletter
+\let\l@equation\l@figure
+\makeatother
+
 \begin{document}
   \titleAM{Dr. Glenn Matthews}{2}{Progress Report}{\semester{1}{2024}}
   \begin{align*}
@@ -115,6 +130,8 @@
   \end{align*}
   \addcontentsline{toc}{part}{Contents}
   \tableofcontents*
+  \listofequations
+
   \clearpage
   \renewcommand{\abstractname}{Summary}
 
@@ -122,7 +139,7 @@
   \input{content}
 
   \bibliographystyle{ieeetr}
-  \bibliography{PR1}
+  \printbibliography
 
   \input{appendix}
 \end{document}

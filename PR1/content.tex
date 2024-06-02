@@ -279,50 +279,6 @@ Once triggered, it sends data packets over the LoRa link, including sensor data,
 
 The Write to Flash Memory task is also low priority process that manages the storage of data frames in the onboard flash memory. It uses a mutex lock to ensure exclusive access to the flash memory, preventing conflicts with other tasks. The task checks if there are enough data frames in the circular buffer to fill a page (256 bytes). If so, it extracts the data frames from the buffer, writes them to flash memory, and updates the buffer position. This process is to repeat in the background unless a higher priority task requires the CPU time or until the flight ends.  
 
-\subsection{Data Processing and Analysis}
-Development of data processing tools and algorithms was in large part a significant challenge within the progression of the project. These systems were developed offline first, mostly through the implementation of scripts built with Python, through analysis of the data that was collected after the flight of Aurora I. 
-
-This section outlines these systems as they were designed, and how they were and will continue to be applied for the analysis of data throughout future Aurora rockets.
-
-\subsubsection{Attitude Estimation}
-As touched on in the literature review, it is important that the rocket maintains some representation of its orientation relative to a global frame of reference during the flight. Since the accelerometers included within the available sensor suite are only able to perform inertial measurement relative to the body axis of the vehicle, the rotational information is applied to rotate and scale these values to determine a true vertical acceleration to apply in further calculations.
-
-The instantaneous angular rate measurements output by the gyroscopic sensors can be considered as time derivatives of the Euler angle representation of the rocket's attitude. As such, by constructing rotation quaternions from these instantaneous rates and applying the rotation to the previously determined attitude (simply the last calculated rotation quaternion), effectively a numerical integration process is applied:\\[0.5em]
-{
-\setlength{\belowdisplayskip}{5pt}%
-\setlength{\abovedisplayskip}{-15pt}%
-\begin{align*}
-  \intertext{First the angular rates in $\unit{\degree}/\unit{\second}$ are converted to Euler angles (radians):}\\
-  \begin{bmatrix}
-    \phi\\\Theta\\\psi
-    \end{bmatrix} &= \frac{\pi}{180}\cdot\begin{bmatrix}
-                                        \omega_x\\\omega_y\\\omega_z
-                                        \end{bmatrix}\\
-    \intertext{A unit quaternion is then initialised through the half Euler angles (per equation 66 ~\cite{Diebel2006})}\\
-    \dot q &= 
-    \begin{bmatrix}
-      c_{\omega_x/2}c_{\omega_y/2}c_{\omega_z/2}-s_{\omega_x/2}c_{\omega_y/2}s_{\omega_z/2}\\
-      c_{\omega_x/2}c_{\omega_y/2}c_{\omega_z/2}+s_{\omega_x/2}s_{\omega_y/2}s_{\omega_z/2}\\
-      c_{\omega_x/2}s_{\omega_y/2}s_{\omega_z/2}-s_{\omega_x/2}c_{\omega_y/2}s_{\omega_z/2}\\
-      c_{\omega_x/2}c_{\omega_y/2}s_{\omega_z/2}+c_{\omega_x/2}c_{\omega_y/2}s_{\omega_z/2}\\
-    \end{bmatrix}\\[0.5ex]
-    \intertext{Where $c_x=\cos{x}$, $s_x=\sin{x}$. Then from equation 102~\cite{Diebel2006}:}\\
-    q_{k} &= q_{k-1}\cdot\dot q\\
-          &= \begin{bmatrix}
-            (q_{{k-1}_0} * \dot q_0) + (-q_{{k-1}_1} * \dot q_1) + (-q_{{k-1}_2} * \dot q_2) + (-q_{{k-1}_3} * \dot q_3)\\
-            (q_{{k-1}_0} * \dot q_1) + (q_{{k-1}_1} * \dot q_0) + (q_{{k-1}_2} * \dot q_3) + (-q_{{k-1}_3} * \dot q_2)\\
-            (q_{{k-1}_0} * \dot q_2) + (-q_{{k-1}_1} * \dot q_3) + (q_{{k-1}_2} * \dot q_0) + (q_{{k-1}_3} * \dot q_1)\\
-            (q_{{k-1}_0} * \dot q_3) + (q_{{k-1}_1} * \dot q_2) + (-q_{{k-1}_2} * \dot q_1) + (q_{{k-1}_3} * \dot q_0)
-             \end{bmatrix}\\
-    \intertext{Finally, normalise the quaternion to $[-1,1]$:}\\
-    q_{normal} &= q_{k} / \sqrt{q_{k_0}^2 + q_{k_1}^2 + q_{k_2}^2 + q_{k_3}^2}
-\end{align*}
-}\\
-
-\noindent The resulting quaternion as calculated through the integration of angular velocities then represents the rotation of the rocket body from its initial pose.
-
-\subsubsection{State Estimation (Velocity and Altitude)}
-
 \subsection{Testing Plan}
 \subsubsection{Verification}
 \let\olditemize=\itemize \let\endolditemize=\enditemize \renewenvironment{itemize}{\olditemize \itemsep-0.5em}{\endolditemize}
@@ -335,6 +291,7 @@ Accelerometer (High G) & Shake table:
     \item Subject the accelerometer to known vibration profiles (frequencies, amplitudes from A1 data) 
     \item Verify output readings accurately reflect the applied vibrations.
   \end{itemize} \\
+\midrule
 Accelerometer (Low G) & Shake table:  
   \begin{itemize}
     \item Subject the accelerometer to known vibration profiles (frequencies, amplitudes from A1 data) 
@@ -349,6 +306,7 @@ Saturation test:
  \begin{itemize}
   \item Slowly rotate the accelerometer across its measurement axes.
  \end{itemize} \\
+\midrule
 Gyroscope & Rate table: 
   \begin{itemize}
     \item Mount gyroscope on a rate table that can rotate at different angular velocities. 
@@ -360,21 +318,25 @@ Bias stability:
     \item Measure average readings within a window of time at each interval, averaging the samples. 
     \item Measure resulting drift over time from initial values
   \end{itemize} \\
+\midrule
 Barometer & Vacuum chamber / temperature test:
   \begin{itemize}  
     \item Placing Barometer in a vacuum chamber and apply different pressure and temperature within a range relevant to expected flight altitudes.  
     \item Verify readings accurately reflect the known pressure values.
   \end{itemize} \\
+\midrule
 Magnetometer & Outdoor testing: 
   \begin{itemize} 
     \item Record data outdoors, with known changes in orientation. 
     \item Compare against expected magnetic field values for your location.
   \end{itemize} \\
+\midrule
 GPS & Outdoor testing: 
   \begin{itemize}
     \item Test in open locations under various conditions including stationary and while moving.  
     \item Evaluate accuracy against known locations or compare against high-precision reference GPS.
   \end{itemize} \\
+\midrule
 LoRa Communications & Transmission range: 
   \begin{itemize} 
     \item Test in different environments (clear line-of-sight and obstructed) to determine effective range.
@@ -383,6 +345,7 @@ LoRa Communications & Transmission range:
  \begin{itemize}
     \item Transmit known data packets and verify correct transmission.
   \end{itemize}\\
+\midrule
  Flash Storage & Retention test:  
   \begin{itemize}
     \item Write data, power off for certain amount of time and verify data remains readable.  
@@ -396,6 +359,7 @@ LoRa Communications & Transmission range:
   \begin{itemize}
     \item Read data back in from flash chip and measure the time it takes.
   \end{itemize} \\
+\midrule
 Microcontroller & Code execution test:  
   \begin{itemize}
     \item Test program functions. 
@@ -413,28 +377,34 @@ Microcontroller & Code execution test:
 \begin{longtable}{<{\raggedright}p{4cm}p{10cm}}
 \toprule
 Sub-Assemblies &
-  Test \\\midrule
+  Test \\
+\midrule
 Recovery Assembly (Sensors, Mirco and GPS) & Data injection tests 
   \begin{itemize}
     \item Place system in a testing mode, connecting recovery outputs to some readable output (i.e. buzzer, LED). 
     \item Feed in data collected from previous flights and determine if recovery system “fires” at the known apogee.
   \end{itemize} \\
-  Gound Communications & Telemetry reception:  
+\midrule
+Gound Communications & Telemetry reception:  
   \begin{itemize}
     \item Test reception of data from Avionics Bay, ensuring that data is correctly being transmitted.
   \end{itemize} \\
+\midrule
 Storage & Data logging:  
   \begin{itemize} 
     \item Validate that sensor data is correctly being stored in flash.
   \end{itemize} \\
+\midrule
 Internal Communications (CAN bus) & Message integrity 
   \begin{itemize}
     \item Test transmission and reception of all expected message types over the CAN bus.
   \end{itemize} \\
+\midrule
 State Estimation & Simulation:  
 \begin{itemize}
   \item Use a simulator to input realistic sensor data. Verify state estimation algorithms correctly calculate state estimation.
 \end{itemize} \\
+\midrule
 SRAD Redundancy & Error injected testing:  
 \begin{itemize}
   \item Testing for failover between primary and secondary systems.  
@@ -450,6 +420,110 @@ SRAD Redundancy & Error injected testing:
 \end{itemize}
 
 Prior to launch, a final ground test will be conducted using flight-like sensor data taken from A1 and A2 profiles. This test will run the Avionics system in "test mode" where simulated packets are transmitted, successful SRAD deployment is indicated through an LED, and aerobrake deployment is verified. This final check verifies correct data flow, decision-making logic, and functionality of both the recovery and aerobrakes systems. 
+
+
+\subsection{Data Processing and Analysis}
+Development of data processing tools and algorithms was in large part a significant challenge within the progression of the project. These systems were developed offline first, mostly through the implementation of scripts built with Python, through analysis of the data that was collected after the flight of Aurora I. 
+
+This section outlines these systems as they were designed, and how they were and will continue to be applied for the analysis of data throughout future Aurora rockets.
+
+\subsubsection{Attitude Estimation}
+As touched on previously, it is important that the rocket maintains some representation of its orientation relative to a global frame of reference during the flight. Since the accelerometers included within the available sensor suite are only able to perform inertial measurement relative to the body axis of the vehicle, the rotational information is applied to rotate and scale these values to determine a true vertical acceleration to apply in further calculations.
+
+The instantaneous angular rate measurements output by the gyroscopic sensors can be considered as time derivatives of the Euler angle representation of the rocket's attitude. As such, by constructing rotation quaternions from these instantaneous rates and applying the rotation to the previously determined attitude (simply the last calculated rotation quaternion), effectively a numerical integration process is applied:\\[0.5em]
+{
+\setlength{\belowdisplayskip}{5pt}%
+\setlength{\abovedisplayskip}{-15pt}%
+\begin{align*}
+  \intertext{First the angular rates in $\unit{\degree}/\unit{\second}$ are converted to Euler angles (radians):}\\
+  \begin{bmatrix}
+    \phi\\\theta\\\psi
+    \end{bmatrix} &= \frac{\pi}{180}\cdot\begin{bmatrix}
+                                        \omega_x\\\omega_y\\\omega_z
+                                        \end{bmatrix}\\
+    \intertext{A unit quaternion is then initialised through the half Euler angles (per equation 66 ~\cite{Diebel2006})}\\
+    \dot q &= 
+    \begin{bmatrix}
+      c_{\phi/2}c_{\theta/2}c_{\psi/2}-s_{\phi/2}c_{\theta/2}s_{\psi/2}\\
+      c_{\phi/2}c_{\theta/2}c_{\psi/2}+s_{\phi/2}s_{\theta/2}s_{\psi/2}\\
+      c_{\phi/2}s_{\theta/2}s_{\psi/2}-s_{\phi/2}c_{\theta/2}s_{\psi/2}\\
+      c_{\phi/2}c_{\theta/2}s_{\psi/2}+c_{\phi/2}c_{\theta/2}s_{\psi/2}\\
+    \end{bmatrix}\\[0.5ex]
+    \intertext{Where $c_x=\cos{x}$, $s_x=\sin{x}$. Then from equation 102~\cite{Diebel2006}:}\\
+    q_{k} &= q_{k-1}\cdot\dot q\\
+          &= \begin{bmatrix}
+            (q_{{k-1}_0}  \dot q_0) + (-q_{{k-1}_1}  \dot q_1) + (-q_{{k-1}_2}  \dot q_2) + (-q_{{k-1}_3}  \dot q_3)\\
+            (q_{{k-1}_0}  \dot q_1) + (q_{{k-1}_1}  \dot q_0) + (q_{{k-1}_2}  \dot q_3) + (-q_{{k-1}_3}  \dot q_2)\\
+            (q_{{k-1}_0}  \dot q_2) + (-q_{{k-1}_1}  \dot q_3) + (q_{{k-1}_2}  \dot q_0) + (q_{{k-1}_3}  \dot q_1)\\
+            (q_{{k-1}_0}  \dot q_3) + (q_{{k-1}_1}  \dot q_2) + (-q_{{k-1}_2}  \dot q_1) + (q_{{k-1}_3}  \dot q_0)
+             \end{bmatrix}\\
+    \intertext{Finally, normalise the quaternion to $[-1,1]$:}\\
+    q_{normal} &= q_{k} / \sqrt{q_{k_0}^2 + q_{k_1}^2 + q_{k_2}^2 + q_{k_3}^2}
+\end{align*}
+}\\
+
+\noindent The resulting quaternion as calculated through the integration of angular velocities then represents the rotation of the rocket body from its initial pose.
+
+\subsubsection{State Estimation (Velocity and Altitude)}
+In order to determine information on the rocket's displacement and upward velocity, a Kalman Filter is applied for greater accuracy in estimation. The filter operates in two steps, first predicting future state values and then updating the predictions through measurement and calculated errors.
+
+\citetitle{Welch1995} describes the following equations for a linear Kalman filter:
+
+\begin{align*}
+    &\intertext{Time update (predict):}
+    &\text{(1) Project the state ahead} \\
+    &\hat{x}_k^- = A \hat{x}_{k-1} + B u_{k-1} \\[0.5em]
+    &\text{(2) Project the error covariance ahead} \\
+    &\bar{P}_k = A P_{k-1} A^T + Q\\[1.5em]
+    &\intertext{Measurement update (correct):}
+    &\text{(1)& Compute the Kalman gain} \\
+    &K_k = \bar{P}_k H^T (H \bar{P}_k H^T + R)^{-1} \\[0.5em]
+    &\text{(2) Update estimate with measurement } z_k \\
+    &\hat{x}_k = \hat{x}_k^- + K_k (z_k - H \hat{x}_k^-) \\[0.5em]
+    &\text{(3) Update the error covariance} \\
+    &P_k = (I - K_k H) \bar{P}_k
+\end{align*}
+
+The state is defined as a tri-cell column vector $x = \{s, v, a\}^T$ for the rocket's altitude, upward velocity, and upward acceleration. The system is modelled with constant acceleration, where $v$ and $s$ are simply integrated from $a$. This results in a state transition matrix $A$:
+\addcontentsline{equ}{chapter}{Kalman Filter}
+\begin{equation}
+  A = \begin{bmatrix}
+        1& dt& \frac{1}{2}dt^2\\
+        0& 1& dt              \\
+        0& 0& 1
+      \end{bmatrix} 
+  \label{eq:kalmanA}
+\end{equation}
+\myequation{State transition model $A$}
+
+Since $s$ and $a$ are measured directly through the barometer and accelerometer respectively, the corresponding measurement model is then:
+
+\begin{equation}
+  H = \begin{bmatrix}
+        1 & 0 & 0\\
+        0 & 0 & 1
+      \end{bmatrix}
+  \label{eq:kalmanH}
+\end{equation}
+\myequation{Measurement model $H$}
+
+Assuming no control input to the system, $B$ and $u$ are both omitted. The measurement of $s$ is simply the altitude as calculated directly from the barometric data, while $a$ must be processed as part of the measurement update.
+
+As the measured acceleration is in reference to the rocket's body axis, the tilt angle is applied to compensate. The previously determined attitude quaternion rotates a unit vector $\uvec{z}$, representing the global vertical axis, to the rocket's body frame axis $\bm{\hat{\textbf{z}}_B}$. The dot product of these two vectors provides the cosine of the tilt angle $\cos{\theta} = \bm{\hat{\textbf{z}}_B}\cdot \uvec{z}$, which is multiplied by the measured acceleration to determine the upwards acceleration in the global frame of reference. 
+
+Given the inertial measurement of the accelerometer includes the reactionary force opposing acceleration due to gravity, this must also be subtracted from the measurement in order to purely determine the upward acceleration of the rocket. The resulting measurement vector follows:
+\begin{equation}
+  z = \begin{bmatrix}
+        s\\
+        (\cos{\theta}\cdot a)-g
+      \end{bmatrix}
+  \label{eq:kalmanZ}
+\end{equation}
+\myequation{Measurement $z$}
+
+Fortunately, the Blue Raven flight computers provide flight data post-recovery against which the performance of these calculations can be measured. A particular advantage of this is that it provides greater flexibility in tuning the noise parameters $Q$ and $R$ of the filter. These were determined offline through a technique provided by the \textit{BayesianOptimization}~\cite{Bayesian2014} Python module. 
+
+The routine calculating state with the implemented filter was fed into the optimisation module, returning a root mean square error between the calculated estimate and the measurements from the Blue Raven. Over several iterations this then determines the noise parameters corresponding to best performance, which can then be applied within the filter.
 
 \section{Aurora I\&II Results and Analysis}
 \subsection{Key Findings}
