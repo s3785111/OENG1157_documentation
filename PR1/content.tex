@@ -51,6 +51,16 @@ Project deliverables and expected outcomes include:
 \end{itemize}
 
 \subsubsection{Design/Research Questions}
+\begin{questions}
+  \item How accurate is the measured apogee to that provided by the Blue Raven (RMS error)
+  \item How accurate are the calculated state values to that provided by the Blue Raven (RMS error)
+  \item Do the selected hardware components remain functional under conditions expected during flight?
+  \item What statistical analysis techniques will be employed to assess real time validity of data? \begin{questions}
+    \item What communication protocols will be used to inform the redundant systems of detected errata?
+    \item What metric(s) will the redundant systems use to elect which of primary and secondary sensors to sample?
+  \end{questions}
+\end{questions}
+
 \subsubsection{Project Scope}
 The Data analytics team is subset of the Avionics sub system and will operate within the project scope that encompasses the following activities: 
 \begin{itemize}
@@ -555,7 +565,7 @@ The resulting velocity calculated by the designed Kalman Filter is provided in F
 
 \begin{figure}[ht!]
   \centering
-  \includegraphics[width=0.75\textwidth]{./img/plot/state/Velocity_X.png}
+  \includegraphics[width=0.65\textwidth]{./img/plot/state/Velocity_X.png}
   \caption{Comparison of quaternion estimates}\label{fig:kalman}
 \end{figure}
 
