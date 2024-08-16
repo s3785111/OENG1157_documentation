@@ -1,0 +1,161 @@
+\documentclass[a4paper, oneside]{memoir}
+
+\usepackage{pgfplots}
+\usepackage{bookmark}
+\usepackage{tocloft}
+\usepackage{longtable}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage{listings}
+\usepackage{amsmath}
+\usepackage{bytefield}
+\usepackage{siunitx}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{pdflscape}
+\usepackage{bm}
+\usepackage[backend=bibtex]{biblatex}
+\addbibresource{PR1.bib}
+\PassOptionsToPackage{hidelinks}{hyperref}
+\hypersetup{pdfborder=0 0 0}
+
+\newcommand{\uvec}[1]{\boldsymbol{\hat{\textbf{#1}}}}
+
+\setlength\cftchapterindent{\cftsectionindent}
+\setlength\cftbeforechapterskip{0pt}
+\setafterparaskip{1ex}
+\setbeforeparaskip{-\beforeparaskip}
+\renewcommand\cftchapterpagefont{\normalfont}
+\setsecnumdepth{paragraph}
+
+\renewcommand{\cftchapterleader}{\cftdotfill{\cftdotsep}}
+
+\setlrmarginsandblock{1.25in}{1.25in}{*} 
+\setulmarginsandblock{1.25in}{1.25in}{*} 
+\checkandfixthelayout%
+
+\renewcommand{\thesection}{\arabic{section}}
+\renewcommand{\thefigure}{\arabic{figure}}
+\renewcommand{\thetable}{\arabic{table}}
+
+\lstset{language=C++,
+                basicstyle=\ttfamily,
+                keywordstyle=\color{blue}\ttfamily,
+                stringstyle=\color{red}\ttfamily,
+                commentstyle=\color{lightgreen}\ttfamily,
+                morecomment=[l][\color{magenta}]{\#}
+}
+
+\newcommand*{\semester}[2]{Semester #1 -- #2} %chktex 8
+\newcommand*{\student}[3]{&\text{#1} &\text{#2} &&\text{#3}} %chktex 8
+\newcommand*{\titleAM}[4]%
+{\begingroup
+  \centering
+  {\Huge Assessment Task 1:\\#3\par}\\[\baselineskip]
+  {\Large HIVE AURC AVIONICS (Data Analytics and Verification)}\\[\baselineskip]
+  {\small\scshape RMIT University}\par
+  {\small\scshape #4}\par\vspace{0.5em}
+  {\large Supervisor: #1}\par\vspace{0.5em}
+  \endgroup}
+
+\renewcommand{\tocheadstart}{}
+\renewcommand{\aftertoctitle}{}
+\renewcommand{\printtoctitle}[1]{}
+\setcounter{tocdepth}{3}
+
+\makeatletter
+\DeclareRobustCommand{\cskippedwords}[2][2ex]{%
+  \setlength{\units@wide}{\bf@bitwidth * \bits@wide}%
+  \setlength{\units@high}{1pt * \ratio{\units@wide}{6.0pt}}%
+  \setlength{\units@tall}{#1 + \units@high}%
+  \edef\num@wide{\strip@pt\units@wide}%
+  \edef\num@tall{\strip@pt\units@tall}%
+  \edef\num@high{\strip@pt\units@high}%
+  \begin{picture}(\num@wide,\num@tall)%
+  \begin{tikzpicture}[overlay]
+  \draw[fill=#2,fill opacity=0.2] 
+    (0,-\bf@bitheight) -- (0,0) -- (0,\units@high) -- (\units@wide,0) -- +(0,-\bf@bitheight) -- cycle;
+  \draw[fill=#2,fill opacity=0.2]
+    (0,\units@high+#1+\bf@bitheight) -- ++(\units@wide,0) -- ++(0,-\bf@bitheight-\units@high) -- (0,\units@high+#1) -- cycle;
+  \end{tikzpicture}%
+  \end{picture}%
+  \ifcounting@words
+    \inc@bytefield@height{\unitlength * \real{\num@tall}}%
+    \global\counting@wordsfalse
+  \fi}
+\makeatother
+
+\usetikzlibrary{shapes.geometric, arrows}
+
+\tikzstyle{start} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=green!30]
+\tikzstyle{stop} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=red!50]
+\tikzstyle{process} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=orange!80, text=white]
+\tikzstyle{decision} = [diamond, minimum width=3cm, minimum height=3cm, text centered, draw=black, fill=blue!50, text=white]
+\tikzstyle{arrow} = [thick,->,>=stealth, draw=blue, text=blue]
+
+\definecolor{bittersweet}{rgb}{1.0, 0.44, 0.37}
+\definecolor{aquamarine}{rgb}{0.5, 1.0, 0.83}
+\definecolor{lavender}{rgb}{0.9, 0.9, 0.98}
+\definecolor{whitesmoke}{rgb}{0.96, 0.96, 0.96}
+\definecolor{lightgreen}{RGB}{102,153,0}    %#669900
+
+\lstset{language=C++,
+        basicstyle=\ttfamily,
+        keywordstyle=\color{blue}\ttfamily,
+        stringstyle=\color{red}\ttfamily,
+        commentstyle=\color{lightgreen}\ttfamily,
+        morecomment=[l][\color{magenta}]{\#},
+        backgroundcolor=\color{whitesmoke}
+}
+
+\renewcommand{\bibname}{References}
+\newlist{questions}{enumerate}{2}
+\setlist[questions,1]{label=RQ\arabic*.,ref=RQ\arabic*}
+\setlist[questions,2]{label=(\alph*),ref=\thequestionsi(\alph*)}
+
+\newcommand{\listquestionsname}{Research Questions}
+\newlistof{listofquestions}{qu}{\listquestionsname}
+\newcommand{\question}[1]{%
+	\addcontentsline{qu}{question}{\protect\numberline{\thequestionsi}#1}\par
+}
+\makeatletter
+\let\l@question\l@figure
+\makeatother
+
+\newcommand{\listequationsname}{List of Equations}
+\newlistof{listofequations}{equ}{\listequationsname}
+\newcommand{\myequation}[1]{%
+	\addcontentsline{equ}{equation}{\protect\numberline{\theequation}#1}\par
+}
+\makeatletter
+\let\l@equation\l@figure
+\makeatother
+
+\addtocontents{lot}{\vskip -1.2cm}
+\addtocontents{equ}{\vskip -1.2cm}
+\addtocontents{qu}{\vskip -1.2cm}
+
+\begin{document}
+  \titleAM{Dr. Glenn Matthews}{2}{Completion Plan}{\semester{2}{2024}}
+  \begin{align*}
+    &\text{Name} &\text{Student No.} &&\text{Contribution}\\
+    \student{Matthew Ricci}{s3785111}{50\%}\\
+    \student{Jeremy Timotius}{s3779178}{50\%}
+  \end{align*}
+  \addcontentsline{toc}{part}{Contents}
+  \tableofcontents*
+  \clearpage
+  \renewcommand{\abstractname}{Summary}
+
+  \markboth{}{}
+  \input{content}
+
+  \bibliographystyle{ieeetr}
+  \printbibliography
+
+  \input{appendix}
+\end{document}
