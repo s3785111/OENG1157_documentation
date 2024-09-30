@@ -1,27 +1,79 @@
 \documentclass[a4paper, oneside]{memoir}
 
+\usepackage[T1]{fontenc}
+\usepackage{palatino}
+\usepackage{cascadia-code}
+\usepackage{lscape}
 \usepackage{pgfplots}
+\usepackage{geometry}
+\usepackage{fancyhdr}
 \usepackage{bookmark}
-\usepackage{tocloft}
-\usepackage{longtable}
-\usepackage{tabularx}
-\usepackage{booktabs}
-\usepackage{array}
+\usepackage{hyperref}
 \usepackage{enumitem}
 \usepackage{graphicx}
 \usepackage{wrapfig}
 \usepackage{listings}
 \usepackage{amsmath}
 \usepackage{bytefield}
+\usepackage{tikz}
+\usepackage{titlesec}
+\usepackage{amsmath}
+\usepackage{bytefield}
 \usepackage{siunitx}
 \usepackage{hyperref}
 \usepackage{graphicx}
-\usepackage{pdflscape}
+\usepackage[yyyymmdd]{datetime}
 \usepackage{bm}
-\usepackage[backend=bibtex]{biblatex}
-\addbibresource{PR1.bib}
 \PassOptionsToPackage{hidelinks}{hyperref}
 \hypersetup{pdfborder=0 0 0}
+\usetikzlibrary{positioning,fit,calc,chains,matrix,arrows.meta}
+\pagestyle{empty}
+
+
+% This sucks
+% --------------------------------------------------------------------------------------
+\makeatletter
+\def\headrule{
+  \vskip-0.4\baselineskip % Adjust the vertical position of the rule if needed
+  \hspace*{-0.7in}\rule{\dimexpr\headwidth+0.25in}{0.4pt} % 0.4pt is the thickness of the rule
+}
+\makeatother
+\fancyhead[L]{
+  \hspace*{-0.7in} % Indent the text
+  \begin{minipage}[t]{\dimexpr\headwidth}
+    \raggedright \textbf{RMIT University} \par
+    \vspace{0.2em} % Adjust vertical spacing between text and rule
+  \end{minipage}
+}
+\fancyhead[R]{\textbf{\rightmark}\hspace{0.5in}}
+\fancyfoot[C]{
+  \hspace*{-1.25in}
+  \centering
+  \thepage
+}
+% --------------------------------------------------------------------------------------
+
+\setlength\cftchapterindent{\cftsectionindent}
+\setlength\cftbeforechapterskip{0pt}
+
+\renewcommand{\cftchapterleader}{\cftdotfill{\cftdotsep}}
+\titleformat*{\section}{\huge\bfseries}
+\titleformat*{\subsection}{\LARGE\bfseries}
+\titleformat*{\subsubsection}{\Large\bfseries}
+
+\setsecnumformat{\csname the#1\endcsname\hspace{0.7in-\widthof{\csname the#1\endcsname}}}
+\setsecindent{-0.7in}
+\setsubsecindent{-0.7in}
+\setsubsubsecindent{-0.7in}
+
+\setlrmarginsandblock{1.5in}{1.5in}{*} 
+\setulmarginsandblock{1.25in}{1.25in}{*} 
+\checkandfixthelayout%
+
+\renewcommand{\baselinestretch}{1.125}
+\renewcommand{\thesection}{\arabic{section}}
+\renewcommand{\thefigure}{\arabic{figure}}
+\setlength{\parskip}{0.5em}
 
 \newcommand{\uvec}[1]{\boldsymbol{\hat{\textbf{#1}}}}
 
@@ -65,7 +117,12 @@
 \renewcommand{\tocheadstart}{}
 \renewcommand{\aftertoctitle}{}
 \renewcommand{\printtoctitle}[1]{}
+\setcounter{secnumdepth}{3}
 \setcounter{tocdepth}{3}
+
+\renewcommand{\printtoctitle}[1]{\huge#1\\[0.25em]}
+\renewcommand{\cftsectionfont}{\textbf}
+\renewcommand{\cftsectionfont}{\textbf}
 
 \makeatletter
 \DeclareRobustCommand{\cskippedwords}[2][2ex]{%
@@ -112,7 +169,6 @@
         backgroundcolor=\color{whitesmoke}
 }
 
-\renewcommand{\bibname}{References}
 \newlist{questions}{enumerate}{2}
 \setlist[questions,1]{label=RQ\arabic*.,ref=RQ\arabic*}
 \setlist[questions,2]{label=(\alph*),ref=\thequestionsi(\alph*)}
@@ -146,16 +202,20 @@
     \student{Matthew Ricci}{s3785111}{50\%}\\
     \student{Jeremy Timotius}{s3779178}{50\%}
   \end{align*}
-  \addcontentsline{toc}{part}{Contents}
-  \tableofcontents*
+
   \clearpage
+  \noindent\makebox[\textwidth]{\includegraphics[width=\headwidth]{./img/banner.png}}
+  \vspace{2.5em}
+  \tableofcontents*
+  \vfill
+  \noindent\makebox[\textwidth]{\includegraphics[width=\headwidth]{./img/footer.png}}
+  \thispagestyle{empty}
+  \clearpage
+
   \renewcommand{\abstractname}{Summary}
 
   \markboth{}{}
   \input{content}
-
-  \bibliographystyle{ieeetr}
-  \printbibliography
 
   \input{appendix}
 \end{document}
