@@ -1,0 +1,64 @@
+\documentclass[a4paper, oneside]{memoir}
+
+\usepackage[T1]{fontenc}
+\usepackage{palatino}
+\usepackage{cascadia-code}
+\usepackage{lscape}
+\usepackage{pgfplots}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{bookmark}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage{listings}
+\usepackage{amsmath}
+\usepackage{bytefield}
+\usepackage{tikz}
+\usepackage{titlesec}
+\usepackage{siunitx}
+\usepackage{hyperref}
+\usepackage[yyyymmdd]{datetime}
+\usepackage{bm}
+\PassOptionsToPackage{hidelinks}{hyperref}
+\hypersetup{pdfborder=0 0 0}
+\usetikzlibrary{positioning,fit,calc,chains,matrix,arrows.meta}
+\pagestyle{empty}
+
+\renewcommand{\thesection}{\arabic{section}}
+\renewcommand{\thesubsection}{\arabic{section}.\arabic{subsection}}
+\renewcommand{\thesubsubsection}{\arabic{section}.\arabic{subsection}.\arabic{subsubsection}}
+
+\begin{document}
+
+\title{
+    \textbf{\Huge OENG1168 Assessment Task 2} \\
+    \vspace{0.5cm} 
+    \textbf{\Huge Final Report} \\
+}
+\author{Matthew Ricci (s3785111) \and Jeremy Timotius (s3779178)}
+\date{Semester 2, 2024}
+
+\maketitle
+
+\begin{tabular}{l l l}
+Name & Student No. & Contribution \\
+Matthew Ricci & s3785111 & 50\% \\
+Jeremy Timotius & s3779178 & 50\%
+\end{tabular}
+
+\clearpage
+
+\vspace{2.5em}
+\tableofcontents*
+\vfill
+
+\thispagestyle{empty}
+\clearpage
+
+\input{content}
+
+\input{appendix}
+
+\end{document}
