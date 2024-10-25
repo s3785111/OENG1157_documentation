@@ -1,0 +1,16 @@
+\renewcommand{\thechapter}{\Alph{chapter}}
+\renewcommand{\thefigure}{\Alph{chapter}.\arabic{figure}}
+\renewcommand{\chaptername}{Appendix}
+\addcontentsline{toc}{part}{Appendix}
+
+\setlength{\beforechapskip}{0pt}
+\setlength{\afterchapskip}{0pt}
+\setlength{\footskip}{5cm}
+
+\clearpage
+\checkandfixthelayout
+
+\chapter{}\label{apdx:A}
+\begin{minipage}{\textwidth}
+  \centering
+\end{minipage}
