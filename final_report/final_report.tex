@@ -10,6 +10,7 @@
 \usepackage{bookmark}
 \usepackage{hyperref}
 \usepackage{enumitem}
+\usepackage{longtable}
 \usepackage{graphicx}
 \usepackage{wrapfig}
 \usepackage{listings}
@@ -24,11 +25,14 @@
 \usepackage{graphicx}
 \usepackage[yyyymmdd]{datetime}
 \usepackage{bm}
+\usepackage[backend=bibtex, bibstyle=ieee, citestyle=numeric-comp]{biblatex}
+\addbibresource{final_report.bib}
 \PassOptionsToPackage{hidelinks}{hyperref}
 \hypersetup{pdfborder=0 0 0}
 \usetikzlibrary{positioning,fit,calc,chains,matrix,arrows.meta}
 \pagestyle{empty}
 
+\DeclareSIUnit{\feet}{ft}
 
 % This sucks
 % --------------------------------------------------------------------------------------
@@ -72,7 +76,6 @@
 
 \renewcommand{\baselinestretch}{1.125}
 \renewcommand{\thesection}{\arabic{section}}
-\renewcommand{\thefigure}{\arabic{figure}}
 \setlength{\parskip}{0.5em}
 
 \newcommand{\uvec}[1]{\boldsymbol{\hat{\textbf{#1}}}}
@@ -90,17 +93,35 @@
 \setulmarginsandblock{1.25in}{1.25in}{*} 
 \checkandfixthelayout%
 
+\renewcommand{\thefigure}{\arabic{section}.\arabic{figure}}
+\numberwithin{figure}{section}
 \renewcommand{\thesection}{\arabic{section}}
-\renewcommand{\thefigure}{\arabic{figure}}
 \renewcommand{\thetable}{\arabic{table}}
 
 \lstset{language=C++,
-                basicstyle=\ttfamily,
-                keywordstyle=\color{blue}\ttfamily,
-                stringstyle=\color{red}\ttfamily,
-                commentstyle=\color{lightgreen}\ttfamily,
-                morecomment=[l][\color{magenta}]{\#}
+        basicstyle=\ttfamily,
+        keywordstyle=\color{blue}\ttfamily,
+        stringstyle=\color{red}\ttfamily,
+        commentstyle=\color{lightgreen}\ttfamily,
+        morecomment=[l][\color{magenta}]{\#},
+        numbers = left,
+        breaklines = true
 }
+
+\let\origthelstnumber\thelstnumber
+\makeatletter
+\newcommand*\Suppressnumber{%
+  \lst@AddToHook{OnNewLine}{%
+    \let\thelstnumber\relax%
+  }%
+}
+
+\newcommand*\Reactivatenumber{%
+  \lst@AddToHook{OnNewLine}{%
+   \let\thelstnumber\origthelstnumber%
+  }%
+}
+\makeatother
 
 \newcommand*{\semester}[2]{Semester #1 -- #2} %chktex 8
 \newcommand*{\student}[3]{&\text{#1} &\text{#2} &&\text{#3}} %chktex 8
@@ -207,6 +228,7 @@
   \noindent\makebox[\textwidth]{\includegraphics[width=\headwidth]{./img/banner.png}}
   \vspace{2.5em}
   \tableofcontents*
+  \listofequations
   \vfill
   \noindent\makebox[\textwidth]{\includegraphics[width=\headwidth]{./img/footer.png}}
   \thispagestyle{empty}
@@ -215,6 +237,9 @@
   \markboth{}{}
   \input{content}
 
+  \printbibliography[title=References]
+
   \clearpage
   \input{appendix}
+
 \end{document}
